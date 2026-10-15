@@ -141,7 +141,11 @@ internal sealed class NotifyIcon
         if (msg == WM_APP_NOTIFY)
         {
             var evt = (uint)(lParam & 0xFFFF);
-            if (evt is WM_LBUTTONUP or NIN_SELECT or NIN_KEYSELECT)
+
+            // NOTIFYICON_VERSION_4 sends both WM_LBUTTONUP and NIN_SELECT for one left-click. Reacting to both made
+            // every click open the library and immediately toggle it shut. NIN_SELECT (mouse) and NIN_KEYSELECT
+            // (keyboard) are the documented "activate" events.
+            if (evt is NIN_SELECT or NIN_KEYSELECT)
             {
                 LibraryRequested?.Invoke();
             }

@@ -35,6 +35,7 @@ public sealed partial class HoldLibrary : WindowEx
     private POINT _anchor;
     private (int X, int Y)? _placed;
     private bool _open;
+    private long _closedByOutsideClickAt = long.MinValue / 2;
     private bool _busy; // dragging out, or a picker/dialog is up: don't close on deactivate
 
     /// <summary>Self-test only: keep open when focus moves (the screenshot tool steals focus).</summary>
@@ -82,6 +83,7 @@ public sealed partial class HoldLibrary : WindowEx
             return;
         }
 
+        _closedByOutsideClickAt = Environment.TickCount64;
         Close("click outside");
     }
 
@@ -91,6 +93,14 @@ public sealed partial class HoldLibrary : WindowEx
         if (_open)
         {
             Close("toggle");
+            return;
+        }
+
+        // Clicking the notification icon while the library is open: mouse-down closes it as an outside click, then
+        // the icon's select event arrives a moment later. That click meant "close", so don't reopen.
+        if (Environment.TickCount64 - _closedByOutsideClickAt < 600)
+        {
+            Log.Write("hold library: ignoring reopen right after an outside-click close");
             return;
         }
 
