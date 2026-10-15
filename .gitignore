@@ -15,3 +15,6 @@ spike/
 # Screenshots and scratch from dev tools
 tools/*.png
 tools/**/*.log
+
+# Design exploration renders (concepts, reviews, zooms); finals live in design/logo/
+design/scratch/

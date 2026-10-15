@@ -1,3 +1,5 @@
+<img src="design/logo/spare-hand-256.png" width="96" alt="Spare Hand icon: a warm mitten holding a file">
+
 # Spare Hand
 
 Windows 11 used to have a little tray that slid down from the top of the screen when you dragged a file. You dropped the file on WhatsApp or Outlook and it got shared. Microsoft started removing it in August 2026, mostly because it kept popping up when people were just moving files around.

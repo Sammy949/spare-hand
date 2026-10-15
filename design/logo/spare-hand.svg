@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 48 48">
+  <!-- Spare Hand app icon. 48x48 grid (Microsoft app-icon guidelines): one metaphor (a hand holding files),
+       light from the top left, subtle 120-degree gradients, flat layers with small tinted shadows. -->
+  <defs>
+    <linearGradient id="mitt" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#FF9A6B"/><stop offset="1" stop-color="#E8573A"/></linearGradient>
+    <linearGradient id="thumb" x1="0.15" y1="0" x2="0.85" y2="1"><stop offset="0" stop-color="#FFB089"/><stop offset="1" stop-color="#F06A49"/></linearGradient>
+    <linearGradient id="cuff" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#C64B31"/><stop offset="1" stop-color="#A33924"/></linearGradient>
+    <linearGradient id="page" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#FFFFFF"/><stop offset="1" stop-color="#E6EBF1"/></linearGradient>
+    <linearGradient id="back" x1="0.2" y1="0" x2="0.8" y2="1"><stop offset="0" stop-color="#CFE5F8"/><stop offset="1" stop-color="#8FC1EC"/></linearGradient>
+    <filter id="onPage" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0.2" dy="0.9" stdDeviation="0.7" flood-color="#7A2A16" flood-opacity="0.38"/></filter>
+    <filter id="onHand" x="-40%" y="-40%" width="180%" height="180%"><feDropShadow dx="0" dy="0.8" stdDeviation="0.8" flood-color="#5A2414" flood-opacity="0.32"/></filter>
+  </defs>
+  <!-- hand: palm/fingers block behind the files, cuff below -->
+  <rect x="12.5" y="10" width="24" height="31" rx="10.5" fill="url(#mitt)"/>
+  <rect x="11.5" y="35.5" width="26" height="9" rx="3" fill="url(#cuff)"/>
+  <!-- files: one behind (Windows blue, a nod to the PowerToys family), one in front -->
+  <rect x="21" y="4.5" width="14" height="18.5" rx="2" transform="rotate(9 28 13.75)" fill="url(#back)" filter="url(#onHand)"/>
+  <g filter="url(#onHand)">
+    <path d="M18 7h8.8L31 11.2V26a2 2 0 0 1-2 2H18a2 2 0 0 1-2-2V9a2 2 0 0 1 2-2z" fill="url(#page)"/>
+    <path d="M26.8 7v3.2a1 1 0 0 0 1 1H31z" fill="#C9D3DF"/>
+  </g>
+  <!-- thumb runs from the cuff up onto the front file's lower-left corner: holding, not floating -->
+  <rect x="11" y="21" width="8" height="16" rx="4" transform="rotate(40 15 29)" fill="url(#thumb)" filter="url(#onPage)"/>
+</svg>

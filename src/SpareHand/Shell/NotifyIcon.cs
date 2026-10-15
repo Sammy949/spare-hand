@@ -1,13 +1,11 @@
 using System.Runtime.InteropServices;
-using Microsoft.Win32;
 
 namespace SpareHand.Shell;
 
 /// <summary>
 /// The notification-area icon: left-click opens the Hold library, right-click shows a native menu.
 /// Runs on its own thread with a message-only window. Re-adds itself when Explorer restarts (TaskbarCreated) and
-/// redraws for the taskbar's light/dark theme. The glyph (Segoe Fluent "hand", U+E815) is a placeholder until the
-/// app icon exists (roadmap item 13).
+/// reloads the icon at the right size when scaling changes.
 /// </summary>
 internal sealed class NotifyIcon
 {
@@ -225,51 +223,20 @@ internal sealed class NotifyIcon
         }
     }
 
-    /// <summary>Draws the glyph into a 32bpp icon at the current small-icon size, coloured for the taskbar theme.</summary>
+    /// <summary>
+    /// The colour app icon at the current small-icon size. PowerToys' tray icon is its colour logo by default
+    /// (monochrome is an opt-in "theme adaptive" setting), and the mitten reads clearly at 16 px.
+    /// </summary>
     private static nint RenderIcon()
     {
-        var dpi = GetDpiForSystem();
-        var size = GetSystemMetricsForDpi(49 /* SM_CXSMICON */, dpi);
-        var light = Registry.GetValue(@"HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize", "SystemUsesLightTheme", 0) is int v && v == 1;
-
-        var bmi = new BITMAPINFOHEADER { biSize = (uint)Marshal.SizeOf<BITMAPINFOHEADER>(), biWidth = size, biHeight = -size, biPlanes = 1, biBitCount = 32 };
-        var screen = GetDC(0);
-        var dc = CreateCompatibleDC(screen);
-        var color = CreateDIBSection(dc, ref bmi, 0, out var bits, 0, 0);
-        var oldBmp = SelectObject(dc, color);
-        // ANTIALIASED_QUALITY, not ClearType: subpixel colour fringes would bleed into the alpha we derive below.
-        var font = CreateFont(-(int)Math.Round(size * 0.92), 0, 0, 0, 400, 0, 0, 0, 1, 0, 0, 4, 0, "Segoe Fluent Icons");
-        var oldFont = SelectObject(dc, font);
-
-        // Draw white glyph on black, then use its luminance as alpha so edges stay smooth on any taskbar.
-        SetBkMode(dc, 1);
-        SetTextColor(dc, 0x00FFFFFF);
-        var rect = new RECT { Right = size, Bottom = size };
-        DrawText(dc, "", -1, ref rect, 0x1 /* DT_CENTER */ | 0x4 /* DT_VCENTER */ | 0x20 /* DT_SINGLELINE */ | 0x100 /* DT_NOCLIP */);
-
-        var pixels = new byte[size * size * 4];
-        Marshal.Copy(bits, pixels, 0, pixels.Length);
-        byte ink = light ? (byte)0x1A : (byte)0xFF;
-        for (var i = 0; i < pixels.Length; i += 4)
+        var size = GetSystemMetricsForDpi(49 /* SM_CXSMICON */, GetDpiForSystem());
+        var path = Path.Combine(AppContext.BaseDirectory, "Assets", "SpareHand.ico");
+        var icon = LoadImage(0, path, 1 /* IMAGE_ICON */, size, size, 0x10 /* LR_LOADFROMFILE */);
+        if (icon == 0)
         {
-            var a = Math.Max(pixels[i], Math.Max(pixels[i + 1], pixels[i + 2]));
-            var c = (byte)(ink * a / 255); // premultiplied
-            pixels[i] = pixels[i + 1] = pixels[i + 2] = c;
-            pixels[i + 3] = a;
+            Log.Write($"notify icon: couldn't load {path}");
         }
 
-        Marshal.Copy(pixels, 0, bits, pixels.Length);
-        SelectObject(dc, oldFont);
-        SelectObject(dc, oldBmp);
-        DeleteObject(font);
-
-        var mask = CreateBitmap(size, size, 1, 1, 0);
-        var info = new ICONINFO { fIcon = true, hbmColor = color, hbmMask = mask };
-        var icon = CreateIconIndirect(ref info);
-        DeleteObject(mask);
-        DeleteObject(color);
-        DeleteDC(dc);
-        ReleaseDC(0, screen);
         return icon;
     }
 
@@ -314,30 +281,8 @@ internal sealed class NotifyIcon
         public int x, y;
     }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct RECT
-    {
-        public int Left, Top, Right, Bottom;
-    }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct BITMAPINFOHEADER
-    {
-        public uint biSize;
-        public int biWidth, biHeight;
-        public ushort biPlanes, biBitCount;
-        public uint biCompression, biSizeImage;
-        public int biXPelsPerMeter, biYPelsPerMeter;
-        public uint biClrUsed, biClrImportant;
-    }
 
-    [StructLayout(LayoutKind.Sequential)]
-    private struct ICONINFO
-    {
-        [MarshalAs(UnmanagedType.Bool)] public bool fIcon;
-        public int xHotspot, yHotspot;
-        public nint hbmMask, hbmColor;
-    }
 
     [DllImport("shell32.dll", CharSet = CharSet.Unicode)] private static extern bool Shell_NotifyIcon(uint msg, ref NOTIFYICONDATA data);
     [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern ushort RegisterClassEx(ref WNDCLASSEX wc);
@@ -357,20 +302,8 @@ internal sealed class NotifyIcon
     [DllImport("user32.dll")] private static extern bool DestroyMenu(nint menu);
     [DllImport("user32.dll")] private static extern bool SetForegroundWindow(nint hwnd);
     [DllImport("user32.dll")] private static extern bool DestroyIcon(nint icon);
-    [DllImport("user32.dll")] private static extern nint CreateIconIndirect(ref ICONINFO info);
+    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern nint LoadImage(nint inst, string name, uint type, int cx, int cy, uint load);
     [DllImport("user32.dll")] private static extern uint GetDpiForSystem();
     [DllImport("user32.dll")] private static extern int GetSystemMetricsForDpi(int index, uint dpi);
-    [DllImport("user32.dll")] private static extern nint GetDC(nint hwnd);
-    [DllImport("user32.dll")] private static extern int ReleaseDC(nint hwnd, nint dc);
-    [DllImport("user32.dll", CharSet = CharSet.Unicode)] private static extern int DrawText(nint dc, string text, int len, ref RECT rect, uint format);
     [DllImport("kernel32.dll", CharSet = CharSet.Unicode)] private static extern nint GetModuleHandle(string? name);
-    [DllImport("gdi32.dll")] private static extern nint CreateCompatibleDC(nint dc);
-    [DllImport("gdi32.dll")] private static extern bool DeleteDC(nint dc);
-    [DllImport("gdi32.dll")] private static extern nint CreateDIBSection(nint dc, ref BITMAPINFOHEADER bmi, uint usage, out nint bits, nint section, uint offset);
-    [DllImport("gdi32.dll")] private static extern nint CreateBitmap(int w, int h, uint planes, uint bpp, nint bits);
-    [DllImport("gdi32.dll")] private static extern nint SelectObject(nint dc, nint obj);
-    [DllImport("gdi32.dll")] private static extern bool DeleteObject(nint obj);
-    [DllImport("gdi32.dll", CharSet = CharSet.Unicode)] private static extern nint CreateFont(int h, int w, int esc, int orient, int weight, uint italic, uint underline, uint strike, uint charset, uint outPrec, uint clipPrec, uint quality, uint pitch, string face);
-    [DllImport("gdi32.dll")] private static extern int SetBkMode(nint dc, int mode);
-    [DllImport("gdi32.dll")] private static extern uint SetTextColor(nint dc, uint color);
 }

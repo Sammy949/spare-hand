@@ -23,7 +23,8 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
 - Reliability pass: survive reboot and sleep, 100-item stress test, multi-file drag-out lands as separate files
 - The "lands in Hold" moment (no wobble)
 - One-time first-run tip, never repeated
-- App icon and identity, installer, signing, CI releases
+- Installer, signing, smaller release package (it's 217 MB unpacked: self-contained .NET + Windows App SDK)
+- Optional monochrome notification-area icon (like PowerToys' "theme adaptive" setting)
 
 ## Next
 
@@ -32,6 +33,18 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
 - A browsable "Recently removed" list
 - Pinned items
 - Any app with a "Send with …" Explorer verb as an extra Send tile
+
+## Other platforms
+
+Windows first, because that's where the gap is: the built-in tray is gone and the polished shelf apps are Mac-only.
+
+- **macOS** is possible (drag-triggered shelves exist there) but crowded, and AirDrop already covers sending to your
+  own devices.
+- **Linux** is hard on Wayland: apps can't watch input or drags in other apps by design, so the mid-drag trigger
+  would need a GNOME Shell extension or a KWin script per desktop. X11 is workable.
+
+To keep the door open, the parts that aren't Windows-specific (the Hold store, the LocalSend client) stay free of
+Windows dependencies, so a future macOS or Linux shell could reuse them.
 
 ## Later
 

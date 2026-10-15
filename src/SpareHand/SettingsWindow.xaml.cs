@@ -24,6 +24,7 @@ public sealed partial class SettingsWindow : WindowEx
         _setPaused = setPaused;
         InitializeComponent();
         SystemBackdrop = new MicaBackdrop();
+        AppWindow.SetIcon(Path.Combine(AppContext.BaseDirectory, "Assets", "SpareHand.ico"));
         ExtendsContentIntoTitleBar = true;
         SetTitleBar(AppTitleBar);
         FitToScreen();
