@@ -19,6 +19,8 @@
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
     <!-- English UI only for now: skip the 3 MB of satellite resource assemblies. -->
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
+    <!-- Releases are trimmed, which disables reflection JSON; disable it everywhere so gaps show up in development. -->
+    <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />

@@ -1,6 +1,5 @@
 using System.Collections.Concurrent;
 using System.Net;
-using System.Net.Http.Json;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Security.Cryptography;
@@ -286,7 +285,7 @@ internal sealed class LocalSendService
             {
                 try
                 {
-                    var j = await _probe.GetFromJsonAsync<JsonObject>($"{scheme}://{ip}:{Port}/api/localsend/v2/info", ct);
+                    var j = JsonNode.Parse(await _probe.GetStringAsync($"{scheme}://{ip}:{Port}/api/localsend/v2/info", ct)) as JsonObject;
                     if (j is not null && (string?)j["fingerprint"] != _identity.Fingerprint)
                     {
                         Remember(ip.ToString(), j, scheme);

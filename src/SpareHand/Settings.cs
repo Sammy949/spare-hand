@@ -12,7 +12,6 @@ internal enum TriggerKey
 
 internal sealed class Settings
 {
-    private static readonly JsonSerializerOptions Json = new() { WriteIndented = true, Converters = { new JsonStringEnumConverter() } };
 
     public TriggerKey Trigger { get; set; } = TriggerKey.Alt;
 
@@ -53,7 +52,7 @@ internal sealed class Settings
             if (File.Exists(path))
             {
                 // Save straight back so settings added in newer builds show up in the file with their defaults.
-                var loaded = JsonSerializer.Deserialize<Settings>(File.ReadAllText(path), Json) ?? new Settings();
+                var loaded = JsonSerializer.Deserialize(File.ReadAllText(path), AppJson.Default.Settings) ?? new Settings();
                 loaded.Save();
                 return loaded;
             }
@@ -73,7 +72,7 @@ internal sealed class Settings
 
     public void Save()
     {
-        File.WriteAllText(AppPaths.File("settings.json"), JsonSerializer.Serialize(this, Json));
+        File.WriteAllText(AppPaths.File("settings.json"), JsonSerializer.Serialize(this, AppJson.Default.Settings));
         Changed?.Invoke();
     }
 

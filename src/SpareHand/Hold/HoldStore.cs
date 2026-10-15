@@ -24,8 +24,8 @@ internal sealed class HoldStore
 
     public HoldStore()
     {
-        _items = Load<List<HoldItem>>(_path) ?? [];
-        _removed = Load<List<List<HoldItem>>>(_removedPath) ?? [];
+        _items = Load(_path, AppJson.Default.ListHoldItem) ?? [];
+        _removed = Load(_removedPath, AppJson.Default.ListListHoldItem) ?? [];
     }
 
     public event Action? Changed;
@@ -108,16 +108,16 @@ internal sealed class HoldStore
 
     private void Save()
     {
-        File.WriteAllText(_path, JsonSerializer.Serialize(_items));
-        File.WriteAllText(_removedPath, JsonSerializer.Serialize(_removed));
+        File.WriteAllText(_path, JsonSerializer.Serialize(_items, AppJson.Default.ListHoldItem));
+        File.WriteAllText(_removedPath, JsonSerializer.Serialize(_removed, AppJson.Default.ListListHoldItem));
         Changed?.Invoke();
     }
 
-    private static T? Load<T>(string path)
+    private static T? Load<T>(string path, System.Text.Json.Serialization.Metadata.JsonTypeInfo<T> type)
     {
         try
         {
-            return File.Exists(path) ? JsonSerializer.Deserialize<T>(File.ReadAllText(path)) : default;
+            return File.Exists(path) ? JsonSerializer.Deserialize(File.ReadAllText(path), type) : default;
         }
         catch (Exception e)
         {
