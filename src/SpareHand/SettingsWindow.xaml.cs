@@ -63,8 +63,6 @@ public sealed partial class SettingsWindow : WindowEx
         QuickShareCard.IsEnabled = quickShare;
         ShowQuickShare.IsOn = _settings.ShowQuickShare;
         ShowLocalSend.IsOn = _settings.ShowLocalSend;
-        ShowShareSheet.IsOn = _settings.ShowShareSheet;
-        MaxFolders.Value = _settings.MaxFolders;
         RemoveAfterDragOut.IsOn = _settings.RemoveAfterDragOut;
         PauseInFullscreen.IsOn = _settings.PauseInFullscreen;
         StartWithWindows.IsOn = SystemIntegration.StartsWithWindows;
@@ -166,22 +164,7 @@ public sealed partial class SettingsWindow : WindowEx
 
         _settings.ShowQuickShare = ShowQuickShare.IsOn;
         _settings.ShowLocalSend = ShowLocalSend.IsOn;
-        _settings.ShowShareSheet = ShowShareSheet.IsOn;
         Save();
-    }
-
-    private void OnMaxFoldersChanged(NumberBox sender, NumberBoxValueChangedEventArgs args)
-    {
-        if (_loading)
-        {
-            return;
-        }
-
-        if (!double.IsNaN(args.NewValue))
-        {
-            _settings.MaxFolders = (int)Math.Clamp(args.NewValue, 0, 6);
-            Save();
-        }
     }
 
     private void OnRemoveAfterDragOutToggled(object sender, RoutedEventArgs e)

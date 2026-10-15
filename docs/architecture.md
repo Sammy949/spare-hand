@@ -17,7 +17,7 @@ src/SpareHand/
   Hold/HoldStore.cs        the held items (paths only) + undoable removals, in %LOCALAPPDATA%\SpareHand
   Hold/HoldLibrary         the library: grid, filter, multi-select, drag-out, context menu
   LocalSend/               protocol client, persisted identity certificate, device picker
-  Shell/                   shell icons, open Explorer folders, file moves, Quick Share verb, Share sheet,
+  Shell/                   shell icons, open Explorer folders, file moves, Quick Share verb, Share sheet, drop host,
                            notification-area icon
   MemoryTrim.cs            idle working-set trim (PowerToys Quick Access pattern)
   SettingsWindow           settings page (Community Toolkit settings controls)
@@ -28,8 +28,8 @@ src/SpareHand/
 1. **Detect.** A `WH_MOUSE_LL` hook sees the left button go down and the cursor move past the system drag threshold.
    The drag counts as real only once the shell's `SysDragImage` window exists, which rules out window moves and text
    selection.
-2. **Prefetch.** On drag start, open Explorer folders are read (Shell.Application on an STA thread) and LocalSend
-   discovery is refreshed, so the tray opens complete.
+2. **Prefetch.** On drag start, open Explorer folders are read (typed shell COM on an STA thread) to seed the "More…"
+   folder picker, and LocalSend discovery is refreshed.
 3. **Trigger.** A `WH_KEYBOARD_LL` hook watches for two taps of the trigger key (each under 250 ms, the gap within the
    double-click time). Any other key resets it, so typing never fires it.
 4. **Show.** The tray window already exists, cloaked and parked off-screen with its drop target registered. It's

@@ -22,7 +22,7 @@ run "'--library-test'" 8
 check "library opens"                  "hold library open"
 run "'--settings'" 8
 toggles=$(cd /mnt/c && powershell.exe -NoProfile -ExecutionPolicy Bypass -File "$(wslpath -w "$T/uia-toggles.ps1")" -Title 'Spare Hand settings' | tr -d '\r' | grep -c -E '^(On|Off) ')
-[ "$toggles" -ge 9 ] && echo "PASS  settings page renders ($toggles toggles)" || echo "FAIL  settings page ($toggles toggles found)"
+[ "$toggles" -ge 8 ] && echo "PASS  settings page renders ($toggles toggles)" || echo "FAIL  settings page ($toggles toggles found)"
 sleep 12
 check "LocalSend scan runs (TLS, JSON)" "localsend scan done"
 nocrash "no errors overall"

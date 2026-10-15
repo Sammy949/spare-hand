@@ -5,8 +5,9 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
 ## Done
 
 - Real-drag detection and a configurable double-tap trigger (Alt, Ctrl or Shift)
-- The tray at the cursor: Hold, Quick Share, LocalSend (device picker after the drop, with cancel), the Windows Share
-  sheet, Desktop and open Explorer folders (Explorer-exact move/copy with undo)
+- The tray at the cursor, a 2 × 2 beside Hold: Quick Share, LocalSend (device picker after the drop, with cancel),
+  Desktop, and More… (a folder picker after the drop, starting in the last Explorer window); Explorer-exact move/copy
+  with undo. The Windows Share sheet lives in the Hold library's Send with menu.
 - The Hold library: thumbnails, filter, multi-select drag-out, context menu, missing-file state with Locate,
   clear with undo, click outside to close
 - Notification-area icon, settings page, start with Windows, quiet in fullscreen apps and excluded apps

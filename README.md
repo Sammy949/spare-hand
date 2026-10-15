@@ -18,8 +18,11 @@ So I built my own, and this one only shows up when you ask for it.
 - **Send**
   - **Quick Share** opens with the file ready, the same as right-click → *Send with Quick Share*.
   - **LocalSend** opens a small picker with the devices on your network. Pick one and it sends. Spare Hand talks to LocalSend directly, so the LocalSend app isn't needed on this PC.
-  - **More** opens the Windows Share sheet (Nearby Sharing, Phone Link, WhatsApp, and so on).
-- **Move to** shows your Desktop and the folders you have open in File Explorer. Moves and copies follow Explorer's own rules (same drive moves, another drive copies, Shift or Ctrl to choose), with Explorer's progress, conflict and undo dialogs.
+- **Move to**
+  - **Desktop**.
+  - **More…** asks where after you drop. It starts in the File Explorer window you used last, skipping the folder the file is already in.
+
+  Moves and copies follow Explorer's own rules (same drive moves, another drive copies, Shift or Ctrl to choose), with Explorer's progress, conflict and undo dialogs.
 
 ## Getting things back out
 

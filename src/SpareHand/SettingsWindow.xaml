@@ -130,24 +130,6 @@
                     </tk:SettingsCard.HeaderIcon>
                     <ToggleSwitch x:Name="ShowLocalSend" Toggled="OnTilesChanged" />
                 </tk:SettingsCard>
-                <tk:SettingsCard Description="The Windows Share sheet: WhatsApp, Phone Link, Nearby Sharing and more." Header="More">
-                    <tk:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE712;" />
-                    </tk:SettingsCard.HeaderIcon>
-                    <ToggleSwitch x:Name="ShowShareSheet" Toggled="OnTilesChanged" />
-                </tk:SettingsCard>
-                <tk:SettingsCard Description="Folders open in File Explorer appear under Move to, most recent first. Desktop is always there." Header="Open folders to show">
-                    <tk:SettingsCard.HeaderIcon>
-                        <FontIcon Glyph="&#xE8B7;" />
-                    </tk:SettingsCard.HeaderIcon>
-                    <NumberBox
-                        x:Name="MaxFolders"
-                        MinWidth="120"
-                        Maximum="6"
-                        Minimum="0"
-                        SpinButtonPlacementMode="Inline"
-                        ValueChanged="OnMaxFoldersChanged" />
-                </tk:SettingsCard>
 
                 <!--  Hold  -->
                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="Hold" />

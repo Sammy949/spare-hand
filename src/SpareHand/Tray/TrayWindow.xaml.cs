@@ -198,9 +198,8 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
         _dropped = false;
         _payload = null;
 
-        var folders = await _openFolders.WaitAsync(TimeSpan.FromMilliseconds(400)).ContinueWith(t => t.IsCompletedSuccessfully ? t.Result : [], TaskScheduler.Default);
         BuildSendRow();
-        BuildMoveRow(folders);
+        BuildMoveRow();
         RefreshHold();
 
         var cursor = at ?? (GetCursorPos(out var p) ? p : default);
@@ -264,7 +263,7 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
         Log.Write($"payload: {paths.Count} item(s), allowed={e.AllowedOperations}, formats=[{string.Join(",", e.DataView.AvailableFormats.Take(6))}]");
 
         // A folder the files already live in can't be a destination.
-        var parents = paths.Select(p => Path.GetDirectoryName(p.TrimEnd('\\'))).Where(d => d is not null).ToHashSet(StringComparer.OrdinalIgnoreCase);
+        var parents = MoveRule.Parents(paths);
         foreach (var tile in MoveRow.Children.OfType<TrayTile>())
         {
             if (tile.Target is FolderTarget f && (parents.Contains(f.FolderPath) || paths.Contains(f.FolderPath, StringComparer.OrdinalIgnoreCase)))
@@ -299,7 +298,7 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
 
     private void OnDragStarted()
     {
-        // Prefetch while the user is still dragging, so the tray opens complete.
+        // Prefetch while the user is still dragging: open Explorer folders seed the "More…" folder picker.
         _openFolders = ExplorerFolders.GetOpenFoldersAsync(TimeSpan.FromSeconds(2));
         if (_settings.ShowLocalSend)
         {
@@ -369,30 +368,24 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
             SendRow.Children.Add(Tile(ls));
         }
 
-        if (_settings.ShowShareSheet)
-        {
-            SendRow.Children.Add(Tile(new ShareSheetTarget { Title = "More", Glyph = "" }));
-        }
-
         var any = SendRow.Children.Count > 0;
         SendCaption.Visibility = any ? Visibility.Visible : Visibility.Collapsed;
         SendRow.Visibility = SendCaption.Visibility;
     }
 
-    private void BuildMoveRow(IReadOnlyList<string> openFolders)
+    /// <summary>
+    /// Desktop and "More…" (pick any folder after the drop). Open Explorer windows used to be listed here, but the
+    /// window the drag came from is nearly always open and on top, so the first folder offered was the one place
+    /// the files couldn't go. They now seed the folder picker instead.
+    /// </summary>
+    private void BuildMoveRow()
     {
         MoveRow.Children.Clear();
         var desktop = Environment.GetFolderPath(Environment.SpecialFolder.DesktopDirectory);
-        var folders = new List<string> { desktop };
-        folders.AddRange(openFolders.Where(f => !string.Equals(f, desktop, StringComparison.OrdinalIgnoreCase)).Take(Math.Max(0, _settings.MaxFolders)));
-
-        foreach (var folder in folders)
-        {
-            var title = string.Equals(folder, desktop, StringComparison.OrdinalIgnoreCase) ? "Desktop" : (Path.GetFileName(folder.TrimEnd('\\')) is { Length: > 0 } n ? n : folder);
-            var target = new FolderTarget { Title = title, FolderPath = folder, Glyph = "" };
-            _ = LoadIconAsync(target, folder, iconOnly: true);
-            MoveRow.Children.Add(Tile(target));
-        }
+        var target = new FolderTarget { Title = "Desktop", FolderPath = desktop, Glyph = "\uE8B7" };
+        _ = LoadIconAsync(target, desktop, iconOnly: true);
+        MoveRow.Children.Add(Tile(target));
+        MoveRow.Children.Add(Tile(new PickFolderTarget(() => _openFolders) { Title = "More…", Glyph = "\uE712" }));
     }
 
     // 84 × 76: icon 32 + gap 6 + two 15px label lines = 68, plus 4+4 padding. Taller tiles left uneven air below the rows.

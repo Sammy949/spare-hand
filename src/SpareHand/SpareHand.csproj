@@ -63,6 +63,8 @@
     <TrimmerRootAssembly Include="WinUIEx" />
     <TrimmerRootAssembly Include="Microsoft.WinUI" />
     <TrimmerRootAssembly Include="Microsoft.InteractiveExperiences.Projection" />
+    <!-- The folder picker's projection: trimmed publishes left it out of deps.json, and "More…" crashed on open. -->
+    <TrimmerRootAssembly Include="Microsoft.Windows.Storage.Pickers.Projection" />
     <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
     <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Triggers" />
     <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Helpers" />

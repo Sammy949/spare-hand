@@ -76,11 +76,20 @@ public partial class App : Application
             _tray.ApplyTheme(argv[themeArg + 1] == "light" ? ElementTheme.Light : ElementTheme.Dark);
         }
 
-        // Self-tests for the post-drop surfaces (no drag needed): --share-test <file>, --picker-test <file>.
+        // Self-tests for the post-drop surfaces (no drag needed): --share-test <file>, --picker-test <file>,
+        // --folder-picker-test <file> (copy only, so a stray pick can never move the file).
         var shareArg = Array.IndexOf(argv, "--share-test");
         if (shareArg >= 0 && shareArg + 1 < argv.Length)
         {
             _ = Shell.ShareSheet.ShowAsync([argv[shareArg + 1]]);
+        }
+
+        var folderPickerArg = Array.IndexOf(argv, "--folder-picker-test");
+        if (folderPickerArg >= 0 && folderPickerArg + 1 < argv.Length)
+        {
+            var payload = new Targets.DragPayload([argv[folderPickerArg + 1]], Windows.ApplicationModel.DataTransfer.DataPackageOperation.Copy);
+            var target = new Targets.PickFolderTarget(() => Shell.ExplorerFolders.GetOpenFoldersAsync(TimeSpan.FromSeconds(2))) { Title = "More…" };
+            _ = target.ExecuteAsync(payload, default, 0);
         }
 
         var pickerArg = Array.IndexOf(argv, "--picker-test");

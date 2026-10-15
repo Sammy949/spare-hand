@@ -22,10 +22,6 @@ internal sealed class Settings
 
     public bool ShowLocalSend { get; set; } = true;
 
-    public bool ShowShareSheet { get; set; } = true;
-
-    public int MaxFolders { get; set; } = 4;
-
     /// <summary>Double-tapping the trigger without a drag opens the Hold library.</summary>
     public bool LibraryOnDoubleTap { get; set; } = true;
 
