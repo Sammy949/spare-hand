@@ -42,6 +42,20 @@
     <PackageReference Include="System.Numerics.Tensors" Version="9.0.0" ExcludeAssets="all" />
   </ItemGroup>
   <ItemGroup>
+    <!--
+      Trimming roots: XAML creates these libraries' types by name at runtime, which the trimmer can't see, so a
+      trimmed build failed in TrayWindow.InitializeComponent with "XAML parsing failed". They're small; the savings
+      come from trimming the .NET runtime and the 25 MB Windows SDK projection, which stay trimmed.
+    -->
+    <TrimmerRootAssembly Include="WinUIEx" />
+    <TrimmerRootAssembly Include="Microsoft.WinUI" />
+    <TrimmerRootAssembly Include="Microsoft.InteractiveExperiences.Projection" />
+    <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Controls.SettingsControls" />
+    <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Triggers" />
+    <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Helpers" />
+    <TrimmerRootAssembly Include="CommunityToolkit.WinUI.Extensions" />
+  </ItemGroup>
+  <ItemGroup>
     <!-- The app icon, also loaded at runtime for the notification area and windows. -->
     <Content Include="Assets\SpareHand.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\SpareHand.png" CopyToOutputDirectory="PreserveNewest" />
