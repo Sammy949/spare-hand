@@ -43,8 +43,9 @@ Windows first, because that's where the gap is: the built-in tray is gone and th
 - **Linux** is hard on Wayland: apps can't watch input or drags in other apps by design, so the mid-drag trigger
   would need a GNOME Shell extension or a KWin script per desktop. X11 is workable.
 
-To keep the door open, the parts that aren't Windows-specific (the Hold store, the LocalSend client) stay free of
-Windows dependencies, so a future macOS or Linux shell could reuse them.
+To keep the door open, the parts that could be shared (the Hold store, the LocalSend protocol client) should move
+into a library with no Windows dependencies. Today the LocalSend client still touches the registry and Windows memory
+APIs, so that split is real work, not just a rename.
 
 ## Later
 
