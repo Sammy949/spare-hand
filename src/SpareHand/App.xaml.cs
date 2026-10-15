@@ -131,6 +131,17 @@ public partial class App : Application
             _selfTestTimer.Start();
         }
 
+        // Exercises the open-Explorer-folders lookup (normally only runs mid-drag): it uses late-bound COM, which is
+        // the part most at risk under trimming.
+        if (argv.Contains("--folders-test"))
+        {
+            _ = Task.Run(async () =>
+            {
+                var folders = await Shell.ExplorerFolders.GetOpenFoldersAsync(TimeSpan.FromSeconds(5));
+                Log.Write($"folders-test: {folders.Count} open folder(s)");
+            });
+        }
+
         if (argv.Contains("--toast-test"))
         {
             Notifier.Show("Spare Hand", "Notifications are working");

@@ -27,10 +27,11 @@
                 <ColumnDefinition Width="Auto" />
                 <ColumnDefinition Width="*" />
             </Grid.ColumnDefinitions>
-            <FontIcon
+            <Image
+                Width="18"
+                Height="18"
                 VerticalAlignment="Center"
-                FontSize="16"
-                Glyph="&#xE815;" />
+                Source="ms-appx:///Assets/SpareHand.png" />
             <TextBlock
                 Grid.Column="1"
                 VerticalAlignment="Center"

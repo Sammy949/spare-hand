@@ -42,5 +42,6 @@
   <ItemGroup>
     <!-- The app icon, also loaded at runtime for the notification area and windows. -->
     <Content Include="Assets\SpareHand.ico" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="Assets\SpareHand.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>
