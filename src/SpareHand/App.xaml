@@ -1,0 +1,76 @@
+<Application
+    x:Class="SpareHand.App"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:backdrops="using:SpareHand.Backdrops">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <XamlControlsResources xmlns="using:Microsoft.UI.Xaml.Controls" />
+            </ResourceDictionary.MergedDictionaries>
+
+            <!--
+                Text and icon roles for elements built in code. Styles with ThemeResource setters resolve against
+                the element's own theme; brushes read from Application.Resources follow the app theme instead,
+                which left white text on a light card.
+            -->
+            <Style x:Key="SpareHandPrimaryText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorPrimaryBrush}" />
+            </Style>
+            <Style x:Key="SpareHandSecondaryText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Style>
+            <Style x:Key="SpareHandCautionText" TargetType="TextBlock">
+                <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCautionBrush}" />
+            </Style>
+            <Style x:Key="SpareHandSecondaryIcon" TargetType="FontIcon">
+                <Setter Property="Foreground" Value="{ThemeResource TextFillColorSecondaryBrush}" />
+            </Style>
+            <Style x:Key="SpareHandCautionIcon" TargetType="FontIcon">
+                <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCautionBrush}" />
+            </Style>
+            <Style x:Key="SpareHandCriticalIcon" TargetType="FontIcon">
+                <Setter Property="Foreground" Value="{ThemeResource SystemFillColorCriticalBrush}" />
+            </Style>
+
+            <!--
+                The card every Spare Hand surface sits on: PowerToys TransientSurface values (docs/design.md).
+                Radius 8, 1px surface-coloured stroke, ThemeShadow, always-active Desktop Acrylic.
+                Kind=Default, not Thin: Thin let saturated backgrounds wash out the secondary text.
+            -->
+            <Style x:Key="SpareHandCard" TargetType="ContentControl">
+                <Setter Property="BorderBrush" Value="{ThemeResource SurfaceStrokeColorDefaultBrush}" />
+                <Setter Property="BorderThickness" Value="1" />
+                <Setter Property="CornerRadius" Value="8" />
+                <Setter Property="IsTabStop" Value="False" />
+                <Setter Property="HorizontalContentAlignment" Value="Stretch" />
+                <Setter Property="VerticalContentAlignment" Value="Stretch" />
+                <Setter Property="Template">
+                    <Setter.Value>
+                        <ControlTemplate TargetType="ContentControl">
+                            <Grid
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="{TemplateBinding CornerRadius}"
+                                Translation="0,0,24">
+                                <Grid.Shadow>
+                                    <ThemeShadow />
+                                </Grid.Shadow>
+                                <SystemBackdropElement CornerRadius="{TemplateBinding CornerRadius}">
+                                    <SystemBackdropElement.SystemBackdrop>
+                                        <backdrops:AlwaysActiveDesktopAcrylicBackdrop Kind="Default" />
+                                    </SystemBackdropElement.SystemBackdrop>
+                                </SystemBackdropElement>
+                                <ContentPresenter
+                                    Padding="{TemplateBinding Padding}"
+                                    HorizontalContentAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                    VerticalContentAlignment="{TemplateBinding VerticalContentAlignment}"
+                                    Content="{TemplateBinding Content}" />
+                            </Grid>
+                        </ControlTemplate>
+                    </Setter.Value>
+                </Setter>
+            </Style>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

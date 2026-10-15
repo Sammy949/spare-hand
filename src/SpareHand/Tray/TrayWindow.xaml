@@ -1,0 +1,52 @@
+<winex:WindowEx
+    x:Class="SpareHand.Tray.TrayWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:winex="using:WinUIEx"
+    Title="Spare Hand">
+    <!--
+        The window is invisible; the card draws everything (PowerToys TransparentWindow + TransientSurface, docs/design.md).
+        Margin 24 = room for the ThemeShadow so it is never clipped by the window edge.
+    -->
+    <Grid x:Name="Root" Background="Transparent">
+        <ContentControl
+            x:Name="Card"
+            Margin="24"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Style="{StaticResource SpareHandCard}">
+            <Grid Padding="8" ColumnSpacing="8">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!--  Hold: the one tall tile, the tray's own silhouette.  -->
+                <Border x:Name="HoldSlot" Width="88" />
+
+                <StackPanel Grid.Column="1" Spacing="2">
+                    <TextBlock
+                        x:Name="SendCaption"
+                        Margin="6,2,0,2"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="Send" />
+                    <StackPanel
+                        x:Name="SendRow"
+                        Orientation="Horizontal"
+                        Spacing="2" />
+                    <TextBlock
+                        x:Name="MoveCaption"
+                        Margin="6,8,0,2"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                        Text="Move to" />
+                    <StackPanel
+                        x:Name="MoveRow"
+                        Orientation="Horizontal"
+                        Spacing="2" />
+                </StackPanel>
+            </Grid>
+        </ContentControl>
+    </Grid>
+</winex:WindowEx>

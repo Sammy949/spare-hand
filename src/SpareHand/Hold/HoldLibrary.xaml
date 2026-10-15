@@ -1,0 +1,164 @@
+<winex:WindowEx
+    x:Class="SpareHand.Hold.HoldLibrary"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:winex="using:WinUIEx"
+    Title="Hold">
+    <!--
+        The Hold library: double-tap the trigger with no drag. Opens at the cursor on that monitor (the one thing
+        notch shelves can't do, docs/research.md). Margin 24 = shadow room, as on the tray.
+    -->
+    <Grid
+        x:Name="Root"
+        Background="Transparent"
+        KeyDown="OnRootKeyDown">
+        <ContentControl
+            x:Name="Card"
+            Width="424"
+            Margin="24"
+            HorizontalAlignment="Left"
+            VerticalAlignment="Top"
+            Style="{StaticResource SpareHandCard}">
+            <Grid Padding="12" RowSpacing="10">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!--  Header: title + count on the left, filter on the right.  -->
+                <Grid ColumnSpacing="12">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="168" />
+                    </Grid.ColumnDefinitions>
+                    <StackPanel
+                        VerticalAlignment="Center"
+                        Orientation="Horizontal"
+                        Spacing="8">
+                        <TextBlock
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                            Text="Hold" />
+                        <TextBlock
+                            x:Name="CountText"
+                            VerticalAlignment="Center"
+                            FontSize="12"
+                            Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    </StackPanel>
+                    <TextBox
+                        x:Name="Filter"
+                        Grid.Column="1"
+                        KeyDown="OnFilterKeyDown"
+                        PlaceholderText="Filter"
+                        TextChanged="OnFilterChanged" />
+                </Grid>
+
+                <!--  Items. Multi-select with Ctrl/Shift/Ctrl+A; drag the selection out in one go.  -->
+                <GridView
+                    x:Name="Items"
+                    Grid.Row="1"
+                    MaxHeight="336"
+                    Margin="-4,0,-4,0"
+                    AllowDrop="False"
+                    CanDragItems="True"
+                    DoubleTapped="OnItemsDoubleTapped"
+                    DragItemsCompleted="OnDragItemsCompleted"
+                    DragItemsStarting="OnDragItemsStarting"
+                    IsItemClickEnabled="False"
+                    KeyDown="OnItemsKeyDown"
+                    RightTapped="OnItemsRightTapped"
+                    SelectionChanged="OnSelectionChanged"
+                    SelectionMode="Extended" />
+
+                <TextBlock
+                    x:Name="EmptyText"
+                    Grid.Row="1"
+                    Margin="0,24"
+                    HorizontalAlignment="Center"
+                    FontSize="12"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    TextAlignment="Center"
+                    TextWrapping="Wrap"
+                    Visibility="Collapsed" />
+
+                <!--  Undo bar after a removal; nothing leaves Hold silently.  -->
+                <Grid
+                    x:Name="UndoBar"
+                    Grid.Row="2"
+                    ColumnSpacing="8"
+                    Visibility="Collapsed">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+                    <TextBlock
+                        x:Name="UndoText"
+                        VerticalAlignment="Center"
+                        FontSize="12"
+                        Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+                    <HyperlinkButton
+                        Grid.Column="1"
+                        Padding="8,2"
+                        Click="OnUndoClick"
+                        Content="Undo"
+                        FontSize="12" />
+                </Grid>
+
+                <!--  Footer: drag-all handle on the left, actions on the right.  -->
+                <Grid Grid.Row="3" ColumnSpacing="8">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <Border
+                        x:Name="DragAll"
+                        Padding="10,6"
+                        Background="{ThemeResource SubtleFillColorSecondaryBrush}"
+                        CanDrag="True"
+                        CornerRadius="4"
+                        DragStarting="OnDragAllStarting"
+                        DropCompleted="OnDragAllCompleted"
+                        ToolTipService.ToolTip="Drag everything selected (or everything) into any app">
+                        <StackPanel Orientation="Horizontal" Spacing="8">
+                            <FontIcon
+                                FontSize="14"
+                                Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                                Glyph="&#xE76F;" />
+                            <TextBlock
+                                x:Name="DragAllText"
+                                VerticalAlignment="Center"
+                                FontSize="12"
+                                Foreground="{ThemeResource TextFillColorPrimaryBrush}"
+                                Text="Drag all" />
+                        </StackPanel>
+                    </Border>
+
+                    <DropDownButton
+                        x:Name="SendButton"
+                        Grid.Column="2"
+                        Padding="10,4"
+                        Content="Send"
+                        FontSize="12">
+                        <DropDownButton.Flyout>
+                            <MenuFlyout x:Name="SendMenu" Placement="Top" />
+                        </DropDownButton.Flyout>
+                    </DropDownButton>
+
+                    <Button
+                        x:Name="ClearButton"
+                        Grid.Column="3"
+                        Padding="10,4"
+                        Click="OnClearClick"
+                        Content="Clear"
+                        FontSize="12" />
+                </Grid>
+            </Grid>
+        </ContentControl>
+    </Grid>
+</winex:WindowEx>

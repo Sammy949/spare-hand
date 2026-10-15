@@ -1,0 +1,27 @@
+name: Bug report
+description: Something didn't work the way it should
+labels: [bug]
+body:
+  - type: textarea
+    id: what
+    attributes:
+      label: What happened
+      description: What you did, what you expected, what happened instead.
+    validations:
+      required: true
+  - type: input
+    id: dragged-from
+    attributes:
+      label: Where you dragged from
+      placeholder: File Explorer, desktop, Chrome, Outlook…
+  - type: input
+    id: setup
+    attributes:
+      label: Windows version, monitors and scaling
+      placeholder: Windows 11 24H2, two monitors at 125% and 100%
+  - type: textarea
+    id: log
+    attributes:
+      label: Log lines
+      description: From %LOCALAPPDATA%\SpareHand\logs. Check them for file names you'd rather not share.
+      render: text

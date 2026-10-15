@@ -1,0 +1,225 @@
+<winex:WindowEx
+    x:Class="SpareHand.SettingsWindow"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:tk="using:CommunityToolkit.WinUI.Controls"
+    xmlns:winex="using:WinUIEx"
+    Title="Spare Hand settings"
+    Width="900"
+    Height="760"
+    MinWidth="560"
+    MinHeight="480">
+    <!--
+        PowerToys settings language (docs/design.md): Mica window, SettingsCard / SettingsExpander from the Windows
+        Community Toolkit (same version PowerToys pins), groups with a plain caption, Fluent glyphs as card icons.
+    -->
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="48" />
+            <RowDefinition Height="*" />
+        </Grid.RowDefinitions>
+
+        <Grid
+            x:Name="AppTitleBar"
+            Padding="16,0,0,0"
+            ColumnSpacing="12">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
+            <FontIcon
+                VerticalAlignment="Center"
+                FontSize="16"
+                Glyph="&#xE815;" />
+            <TextBlock
+                Grid.Column="1"
+                VerticalAlignment="Center"
+                Style="{StaticResource CaptionTextBlockStyle}"
+                Text="Spare Hand settings" />
+        </Grid>
+
+        <ScrollViewer Grid.Row="1" Padding="40,8,40,40">
+            <StackPanel MaxWidth="960" Spacing="4">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    Style="{StaticResource TitleTextBlockStyle}"
+                    Text="Spare Hand" />
+                <TextBlock
+                    Margin="0,0,0,20"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}"
+                    Text="A spare hand for moving and sharing files. Drag a file, double-tap your trigger key, drop it where it needs to go."
+                    TextWrapping="Wrap" />
+
+                <tk:SettingsCard Description="Turn off to stop the trigger everywhere until you turn it back on." Header="Spare Hand is listening">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE815;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="Listening" Toggled="OnListeningToggled" />
+                </tk:SettingsCard>
+
+                <!--  Activation  -->
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="Activation" />
+                <tk:SettingsCard Description="Double-tap it while dragging a file to open the tray." Header="Trigger key">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE765;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ComboBox x:Name="Trigger" MinWidth="160" SelectionChanged="OnTriggerChanged">
+                        <ComboBoxItem Content="Alt" Tag="Alt" />
+                        <ComboBoxItem Content="Ctrl" Tag="Ctrl" />
+                        <ComboBoxItem Content="Shift" Tag="Shift" />
+                    </ComboBox>
+                </tk:SettingsCard>
+                <InfoBar
+                    x:Name="CtrlClash"
+                    IsClosable="False"
+                    Message="PowerToys Find My Mouse also opens on a double Ctrl press, so both would fire. Choose Alt or Shift here, or change Find My Mouse's activation in PowerToys."
+                    Severity="Warning"
+                    Title="Clashes with Find My Mouse" />
+                <InfoBar
+                    x:Name="ShiftNote"
+                    IsClosable="False"
+                    Message="JetBrains IDEs open Search Everywhere on a double Shift press. Spare Hand only fires during a drag, or with no drag when the library shortcut below is on."
+                    Severity="Informational"
+                    Title="Heads up" />
+                <tk:SettingsCard Description="How quickly the two taps must follow each other." Header="Double-tap speed">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE916;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ComboBox x:Name="TapSpeed" MinWidth="200" SelectionChanged="OnTapSpeedChanged">
+                        <ComboBoxItem x:Name="TapSystem" Tag="0" />
+                        <ComboBoxItem Content="Faster (300 ms)" Tag="300" />
+                        <ComboBoxItem Content="Slower (700 ms)" Tag="700" />
+                    </ComboBox>
+                </tk:SettingsCard>
+                <tk:SettingsExpander Description="Double-tap the trigger with no file held to see everything in Hold and drag it back out." Header="Open the Hold library">
+                    <tk:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE7B8;" />
+                    </tk:SettingsExpander.HeaderIcon>
+                    <ToggleSwitch x:Name="LibraryOnDoubleTap" Toggled="OnLibraryToggled" />
+                    <tk:SettingsExpander.Items>
+                        <tk:SettingsCard Description="Optional. A regular shortcut for the library, for when the double-tap clashes with another app." Header="Extra shortcut">
+                            <StackPanel Spacing="4">
+                                <TextBox
+                                    x:Name="LibraryHotkey"
+                                    MinWidth="200"
+                                    LostFocus="OnHotkeyCommitted"
+                                    PlaceholderText="e.g. Win+Shift+H" />
+                                <TextBlock
+                                    x:Name="HotkeyError"
+                                    FontSize="12"
+                                    Foreground="{ThemeResource SystemFillColorCriticalBrush}"
+                                    Text="Use modifiers plus a letter, digit or F-key, like Win+Shift+H."
+                                    Visibility="Collapsed" />
+                            </StackPanel>
+                        </tk:SettingsCard>
+                    </tk:SettingsExpander.Items>
+                </tk:SettingsExpander>
+
+                <!--  Tray  -->
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="Tray" />
+                <tk:SettingsCard x:Name="QuickShareCard" Header="Quick Share">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE72D;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="ShowQuickShare" Toggled="OnTilesChanged" />
+                </tk:SettingsCard>
+                <tk:SettingsCard Description="Pick a device after you drop. Spare Hand talks to LocalSend directly; the LocalSend app isn't required on this PC." Header="LocalSend">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8EA;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="ShowLocalSend" Toggled="OnTilesChanged" />
+                </tk:SettingsCard>
+                <tk:SettingsCard Description="The Windows Share sheet: WhatsApp, Phone Link, Nearby Sharing and more." Header="More">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE712;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="ShowShareSheet" Toggled="OnTilesChanged" />
+                </tk:SettingsCard>
+                <tk:SettingsCard Description="Folders open in File Explorer appear under Move to, most recent first. Desktop is always there." Header="Open folders to show">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE8B7;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <NumberBox
+                        x:Name="MaxFolders"
+                        MinWidth="120"
+                        Maximum="6"
+                        Minimum="0"
+                        SpinButtonPlacementMode="Inline"
+                        ValueChanged="OnMaxFoldersChanged" />
+                </tk:SettingsCard>
+
+                <!--  Hold  -->
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="Hold" />
+                <tk:SettingsCard Description="Off by default: nothing leaves Hold on its own. Hold keeps links to your files and never copies, moves or expires them." Header="Remove items after dragging them out">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE74D;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="RemoveAfterDragOut" Toggled="OnRemoveAfterDragOutToggled" />
+                </tk:SettingsCard>
+
+                <!--  Quiet  -->
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="Where Spare Hand stays quiet" />
+                <tk:SettingsCard Description="Games, videos, presentations and anything else filling the screen." Header="Fullscreen apps">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE740;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="PauseInFullscreen" Toggled="OnFullscreenToggled" />
+                </tk:SettingsCard>
+                <tk:SettingsExpander x:Name="ExcludedExpander" Description="The trigger never fires while these apps are in front." Header="Excluded apps">
+                    <tk:SettingsExpander.HeaderIcon>
+                        <FontIcon Glyph="&#xE8F8;" />
+                    </tk:SettingsExpander.HeaderIcon>
+                    <tk:SettingsExpander.Items>
+                        <tk:SettingsCard ContentAlignment="Left">
+                            <StackPanel Spacing="8">
+                                <StackPanel x:Name="ExcludedList" Spacing="4" />
+                                <StackPanel Orientation="Horizontal" Spacing="8">
+                                    <TextBox
+                                        x:Name="ExcludeInput"
+                                        MinWidth="220"
+                                        KeyDown="OnExcludeKeyDown"
+                                        PlaceholderText="App name, e.g. photoshop.exe" />
+                                    <Button Click="OnExcludeAdd" Content="Add" />
+                                </StackPanel>
+                            </StackPanel>
+                        </tk:SettingsCard>
+                    </tk:SettingsExpander.Items>
+                </tk:SettingsExpander>
+
+                <!--  General  -->
+                <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="General" />
+                <tk:SettingsCard Description="Starts quietly in the notification area when you sign in." Header="Start with Windows">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7E8;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="StartWithWindows" Toggled="OnStartupToggled" />
+                </tk:SettingsCard>
+                <tk:SettingsCard Description="When hidden, open Spare Hand again from Start to get to the Hold library and these settings." Header="Notification-area icon">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE7E7;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="ShowNotifyIcon" Toggled="OnNotifyIconToggled" />
+                </tk:SettingsCard>
+                <tk:SettingsCard
+                    x:Name="FolderCard"
+                    Click="OnOpenFolder"
+                    Description="Settings, Hold and logs live here. Nothing leaves this PC except files you send."
+                    Header="Spare Hand's folder"
+                    IsClickEnabled="True">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xE838;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <tk:SettingsCard.ActionIcon>
+                        <FontIcon Glyph="&#xE8A7;" />
+                    </tk:SettingsCard.ActionIcon>
+                </tk:SettingsCard>
+
+                <TextBlock
+                    x:Name="VersionText"
+                    Margin="0,20,0,0"
+                    FontSize="12"
+                    Foreground="{ThemeResource TextFillColorSecondaryBrush}" />
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</winex:WindowEx>

@@ -1,0 +1,17 @@
+# Build output
+bin/
+obj/
+publish/
+*.user
+.vs/
+.vscode/
+
+# Private working notes (contain machine-specific details); public versions live in docs/
+notes/
+
+# The original throwaway spike
+spike/
+
+# Screenshots and scratch from dev tools
+tools/*.png
+tools/**/*.log
