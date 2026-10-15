@@ -3,10 +3,12 @@ name: release
 # Two ways to publish a release:
 #   - Actions → release → Run workflow, and type a version (e.g. v0.1.0). The tag is created for you.
 #   - or push a tag: git tag v0.1.0 && git push origin v0.1.0
-# The zip keeps the same name every release, so this link always downloads the newest one:
-#   https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-win-x64.zip
+# The installer keeps the same name every release, so this link always downloads the newest one:
+#   https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-Setup.exe
+#   - every push to main runs it as a dry run: the installer is built and uploaded as an artifact, nothing is published.
 on:
   push:
+    branches: [main]
     tags: ['v*']
   workflow_dispatch:
     inputs:
@@ -21,7 +23,8 @@ jobs:
   release:
     runs-on: windows-latest
     env:
-      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || github.ref_name }}
+      TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || (startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.0.0-dev') }}
+      PUBLISH: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -42,27 +45,47 @@ jobs:
           dotnet publish src/SpareHand/SpareHand.csproj -c Release -r win-x64 --self-contained -p:Platform=x64 -p:PublishTrimmed=true -p:TrimMode=partial "-p:Version=$version" -o "publish/Spare Hand"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      - name: Zip and checksum
+      # The exact Inno Setup build the installer was tested with, checked by hash, unpacked without installing.
+      - name: Get Inno Setup 6.7.3
+        shell: pwsh
+        run: |
+          Invoke-WebRequest https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe -OutFile innosetup.exe
+          $hash = (Get-FileHash innosetup.exe -Algorithm SHA256).Hash.ToLower()
+          if ($hash -ne '9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732') { throw "Inno Setup download doesn't match the tested build: $hash" }
+          Start-Process innosetup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/PORTABLE=1','/CURRENTUSER','/NOICONS',"/DIR=$PWD\inno" -Wait
+
+      - name: Build SpareHand-Setup.exe
         shell: pwsh
         run: |
           if (-not (Test-Path "publish/Spare Hand/SpareHand.pri")) { throw "SpareHand.pri missing: every window would fail to load" }
           Remove-Item "publish/Spare Hand/*.pdb"
-          # One top-level "Spare Hand" folder inside the zip, so unzipping never scatters 300 files.
-          Compress-Archive -Path "publish/Spare Hand" -DestinationPath SpareHand-win-x64.zip
-          $hash = (Get-FileHash SpareHand-win-x64.zip -Algorithm SHA256).Hash.ToLower()
-          "$hash  SpareHand-win-x64.zip" | Out-File -Encoding ascii SpareHand-win-x64.zip.sha256
+          $version = $env:TAG.TrimStart('v').Split('-')[0]
+          & ./inno/ISCC.exe /Q "/DAppVersion=$version" "/DSourceDir=$PWD\publish\Spare Hand" installer/SpareHand.iss
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          Move-Item installer/out/SpareHand-Setup.exe .
+          $hash = (Get-FileHash SpareHand-Setup.exe -Algorithm SHA256).Hash.ToLower()
+          "$hash  SpareHand-Setup.exe" | Out-File -Encoding ascii SpareHand-Setup.exe.sha256
           "SHA256: $hash"
-          "{0:N1} MB zipped" -f ((Get-Item SpareHand-win-x64.zip).Length / 1MB)
+          "{0:N1} MB" -f ((Get-Item SpareHand-Setup.exe).Length / 1MB)
+
+      - name: Upload installer (dry run)
+        if: env.PUBLISH != 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: SpareHand-Setup-${{ github.sha }}
+          path: SpareHand-Setup.exe
+          retention-days: 14
 
       # Not --prerelease: GitHub's releases/latest link skips pre-releases, and the README download link uses it.
       - name: Create release
+        if: env.PUBLISH == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         shell: pwsh
         run: |
           $notes = @"
-          **[Download SpareHand-win-x64.zip](https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-win-x64.zip)**, unzip, run ``SpareHand.exe`` in the ``Spare Hand`` folder. x64 Windows 11.
+          **[Download SpareHand-Setup.exe](https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-Setup.exe)** and run it. No admin rights needed. x64 Windows 11.
 
           Early build, not code-signed yet: Windows SmartScreen will ask first. Click **More info**, then **Run anyway**. Bugs and ideas: [open an issue](https://github.com/Sammy949/spare-hand/issues/new/choose).
           "@
-          gh release create $env:TAG SpareHand-win-x64.zip SpareHand-win-x64.zip.sha256 --target $env:GITHUB_SHA --latest --generate-notes --notes $notes --title "Spare Hand $env:TAG"
+          gh release create $env:TAG SpareHand-Setup.exe SpareHand-Setup.exe.sha256 --target $env:GITHUB_SHA --latest --generate-notes --notes $notes --title "Spare Hand $env:TAG"

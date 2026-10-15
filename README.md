@@ -38,13 +38,11 @@ If you pick Ctrl and have PowerToys Find My Mouse on its default double-Ctrl, th
 
 ## Install
 
-1. **[Download Spare Hand](https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-win-x64.zip)** (zip, about 35 MB).
-2. Unzip it anywhere you like. You get a `Spare Hand` folder.
-3. Run `SpareHand.exe` inside it. A small hand shows up in the notification area.
+**[Download SpareHand-Setup.exe](https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-Setup.exe)** (about 24 MB) and run it. It installs just for you, so no admin prompt, and you can have it start when you sign in.
 
-Windows will probably say **"Windows protected your PC"** the first time. That's SmartScreen being cautious about a new app that isn't code-signed yet (signing costs money I haven't spent yet). Click **More info**, then **Run anyway**. If you'd rather not trust a zip from a stranger, the whole thing builds from this repo in a minute, see below.
+Windows will probably say **"Windows protected your PC"** first. That's SmartScreen being cautious about a new app that isn't code-signed yet (signing costs money I haven't spent yet). Click **More info**, then **Run anyway**. If you'd rather not trust an installer from a stranger, the whole thing builds from this repo in a minute, see below.
 
-There's no installer. Turn on **Start with Windows** in settings if you want it around after a restart. To remove it, quit from the notification-area menu, delete the folder, and delete `%LOCALAPPDATA%\SpareHand` (your settings and Hold list).
+To remove it: Settings → Apps → Spare Hand → Uninstall. It asks whether to keep your settings and Hold list.
 
 x64 Windows 11. It targets Windows 10 (19041) and later too, but hasn't been tried there yet.
 
