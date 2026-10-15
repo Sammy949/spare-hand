@@ -22,6 +22,7 @@ permissions:
 jobs:
   release:
     runs-on: windows-latest
+    timeout-minutes: 20
     env:
       TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.version || (startsWith(github.ref, 'refs/tags/') && github.ref_name || 'v0.0.0-dev') }}
       PUBLISH: ${{ github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/') }}
@@ -52,7 +53,12 @@ jobs:
           Invoke-WebRequest https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe -OutFile innosetup.exe
           $hash = (Get-FileHash innosetup.exe -Algorithm SHA256).Hash.ToLower()
           if ($hash -ne '9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732') { throw "Inno Setup download doesn't match the tested build: $hash" }
-          Start-Process innosetup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/PORTABLE=1','/CURRENTUSER','/NOICONS',"/DIR=$PWD\inno" -Wait
+          # WaitForExit, not Start-Process -Wait: in PowerShell 7 -Wait also waits for every child process, and the
+          # first CI run hung here for 17 minutes.
+          $p = Start-Process innosetup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/SP-','/NORESTART','/PORTABLE=1','/CURRENTUSER','/NOICONS',"/DIR=$PWD\inno",'/LOG=inno-setup.log' -PassThru
+          if (-not $p.WaitForExit(180000)) { Get-Content inno-setup.log -Tail 30 -ErrorAction SilentlyContinue; throw "Inno Setup didn't finish unpacking in 3 minutes" }
+          if (-not (Test-Path inno/ISCC.exe)) { Get-Content inno-setup.log -Tail 30 -ErrorAction SilentlyContinue; throw "ISCC.exe missing after unpacking (exit $($p.ExitCode))" }
+          "Inno Setup ready (exit $($p.ExitCode))"
 
       - name: Build SpareHand-Setup.exe
         shell: pwsh
