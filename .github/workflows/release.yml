@@ -46,19 +46,16 @@ jobs:
           dotnet publish src/SpareHand/SpareHand.csproj -c Release -r win-x64 --self-contained -p:Platform=x64 -p:PublishTrimmed=true -p:TrimMode=partial "-p:Version=$version" -o "publish/Spare Hand"
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
-      # The exact Inno Setup build the installer was tested with, checked by hash, unpacked without installing.
-      - name: Get Inno Setup 6.7.3
+      # GitHub's Windows images ship Inno Setup 6 (6.7.1 as of image 20261004). Downloading and unpacking our own
+      # copy on top of it stalled the runner for 17 minutes, then hit a 3-minute timeout, without writing a log.
+      - name: Find Inno Setup
         shell: pwsh
         run: |
-          Invoke-WebRequest https://github.com/jrsoftware/issrc/releases/download/is-6_7_3/innosetup-6.7.3.exe -OutFile innosetup.exe
-          $hash = (Get-FileHash innosetup.exe -Algorithm SHA256).Hash.ToLower()
-          if ($hash -ne '9c73c3bae7ed48d44112a0f48e66742c00090bdb5bef71d9d3c056c66e97b732') { throw "Inno Setup download doesn't match the tested build: $hash" }
-          # WaitForExit, not Start-Process -Wait: in PowerShell 7 -Wait also waits for every child process, and the
-          # first CI run hung here for 17 minutes.
-          $p = Start-Process innosetup.exe -ArgumentList '/VERYSILENT','/SUPPRESSMSGBOXES','/SP-','/NORESTART','/PORTABLE=1','/CURRENTUSER','/NOICONS',"/DIR=$PWD\inno",'/LOG=inno-setup.log' -PassThru
-          if (-not $p.WaitForExit(180000)) { Get-Content inno-setup.log -Tail 30 -ErrorAction SilentlyContinue; throw "Inno Setup didn't finish unpacking in 3 minutes" }
-          if (-not (Test-Path inno/ISCC.exe)) { Get-Content inno-setup.log -Tail 30 -ErrorAction SilentlyContinue; throw "ISCC.exe missing after unpacking (exit $($p.ExitCode))" }
-          "Inno Setup ready (exit $($p.ExitCode))"
+          $iscc = (Get-Command iscc.exe -ErrorAction SilentlyContinue).Source
+          if (-not $iscc) { $iscc = @("${env:ProgramFiles(x86)}\Inno Setup 6\ISCC.exe", "$env:ProgramFiles\Inno Setup 6\ISCC.exe") | Where-Object { Test-Path $_ } | Select-Object -First 1 }
+          if (-not $iscc) { throw "Inno Setup 6 isn't on this runner image any more" }
+          "ISCC=$iscc" | Out-File -Append -Encoding utf8 $env:GITHUB_ENV
+          "Inno Setup: $iscc ($((Get-Item $iscc).VersionInfo.ProductVersion))"
 
       - name: Build SpareHand-Setup.exe
         shell: pwsh
@@ -66,7 +63,7 @@ jobs:
           if (-not (Test-Path "publish/Spare Hand/SpareHand.pri")) { throw "SpareHand.pri missing: every window would fail to load" }
           Remove-Item "publish/Spare Hand/*.pdb"
           $version = $env:TAG.TrimStart('v').Split('-')[0]
-          & ./inno/ISCC.exe /Q "/DAppVersion=$version" "/DSourceDir=$PWD\publish\Spare Hand" installer/SpareHand.iss
+          & $env:ISCC /Q "/DAppVersion=$version" "/DSourceDir=$PWD\publish\Spare Hand" installer/SpareHand.iss
           if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
           Move-Item installer/out/SpareHand-Setup.exe .
           $hash = (Get-FileHash SpareHand-Setup.exe -Algorithm SHA256).Hash.ToLower()
