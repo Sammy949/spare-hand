@@ -38,7 +38,17 @@ If you pick Ctrl and have PowerToys Find My Mouse on its default double-Ctrl, th
 
 ## Install
 
-There's no signed release yet. Builds from GitHub Actions will show up under [Releases](../../releases) once they're ready. Until then, build it yourself:
+1. **[Download Spare Hand](https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-win-x64.zip)** (zip, about 35 MB).
+2. Unzip it anywhere you like. You get a `Spare Hand` folder.
+3. Run `SpareHand.exe` inside it. A small hand shows up in the notification area.
+
+Windows will probably say **"Windows protected your PC"** the first time. That's SmartScreen being cautious about a new app that isn't code-signed yet (signing costs money I haven't spent yet). Click **More info**, then **Run anyway**. If you'd rather not trust a zip from a stranger, the whole thing builds from this repo in a minute, see below.
+
+There's no installer. Turn on **Start with Windows** in settings if you want it around after a restart. To remove it, quit from the notification-area menu, delete the folder, and delete `%LOCALAPPDATA%\SpareHand` (your settings and Hold list).
+
+x64 Windows 11. It targets Windows 10 (19041) and later too, but hasn't been tried there yet.
+
+### Build it yourself
 
 ```powershell
 git clone https://github.com/Sammy949/spare-hand
@@ -46,7 +56,7 @@ cd spare-hand
 dotnet build src/SpareHand/SpareHand.csproj -c Release -p:Platform=x64
 ```
 
-You need the [.NET 10 SDK](https://dotnet.microsoft.com/download) and x64 Windows. No Visual Studio required. It targets Windows 10 (19041) and later, but has only been tested on Windows 11 so far.
+You need the [.NET 10 SDK](https://dotnet.microsoft.com/download). No Visual Studio required.
 
 ## Privacy
 
