@@ -21,6 +21,14 @@
     <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
     <!-- Releases are trimmed, which disables reflection JSON; disable it everywhere so gaps show up in development. -->
     <JsonSerializerIsReflectionEnabledByDefault>false</JsonSerializerIsReflectionEnabledByDefault>
+    <!--
+      PowerToys' settings for trimmed / AOT WinUI apps (src/Common.Dotnet.AotCompatibility.props). The CsWinRT AOT
+      optimizer generates, at compile time, the interop glue WinUI needs to call into our own classes; without it a
+      trimmed build failed with "XAML parsing failed" creating the first window.
+    -->
+    <IsAotCompatible>true</IsAotCompatible>
+    <CsWinRTAotOptimizerEnabled>true</CsWinRTAotOptimizerEnabled>
+    <CsWinRTAotWarningLevel>2</CsWinRTAotWarningLevel>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
@@ -47,6 +55,11 @@
       trimmed build failed in TrayWindow.InitializeComponent with "XAML parsing failed". They're small; the savings
       come from trimming the .NET runtime and the 25 MB Windows SDK projection, which stay trimmed.
     -->
+    <!--
+      Spare Hand itself: its [ComImport] shell interfaces are declared in vtable order, and the trimmer removes the
+      methods we never call, which shifts the vtable (open Explorer folders came back empty). The assembly is small.
+    -->
+    <TrimmerRootAssembly Include="SpareHand" />
     <TrimmerRootAssembly Include="WinUIEx" />
     <TrimmerRootAssembly Include="Microsoft.WinUI" />
     <TrimmerRootAssembly Include="Microsoft.InteractiveExperiences.Projection" />
@@ -60,4 +73,13 @@
     <Content Include="Assets\SpareHand.ico" CopyToOutputDirectory="PreserveNewest" />
     <Content Include="Assets\SpareHand.png" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
+  <!--
+    The app's own resource index (SpareHand.pri, which also carries the compiled XAML) is generated into the build
+    output but an unpackaged publish doesn't copy it. Without it every window fails with "XAML parsing failed".
+  -->
+  <Target Name="PublishProjectPri" AfterTargets="ComputeResolvedFilesToPublishList">
+    <ItemGroup>
+      <ResolvedFileToPublish Include="$(ProjectPriFullPath)" RelativePath="$(ProjectPriFileName)" CopyToPublishDirectory="PreserveNewest" Condition="Exists('$(ProjectPriFullPath)')" />
+    </ItemGroup>
+  </Target>
 </Project>

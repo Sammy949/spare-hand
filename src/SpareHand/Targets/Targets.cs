@@ -5,7 +5,7 @@ using Windows.ApplicationModel.DataTransfer.DragDrop;
 
 namespace SpareHand.Targets;
 
-internal sealed class HoldTarget(HoldStore store) : TrayTarget
+internal sealed partial class HoldTarget(HoldStore store) : TrayTarget
 {
     public override TargetGroup Group => TargetGroup.Hold;
 
@@ -19,7 +19,7 @@ internal sealed class HoldTarget(HoldStore store) : TrayTarget
     }
 }
 
-internal sealed class FolderTarget : TrayTarget
+internal sealed partial class FolderTarget : TrayTarget
 {
     public required string FolderPath { get; init; }
 
@@ -61,7 +61,7 @@ internal sealed class FolderTarget : TrayTarget
     }
 }
 
-internal sealed class QuickShareTarget : TrayTarget
+internal sealed partial class QuickShareTarget : TrayTarget
 {
     public static readonly Guid VerbClsid = new("AD54D7CA-052D-4730-B0F2-2BA34D3438DC");
 
@@ -73,7 +73,7 @@ internal sealed class QuickShareTarget : TrayTarget
         ExplorerCommand.InvokeAsync(VerbClsid, payload.Paths);
 }
 
-internal sealed class ShareSheetTarget : TrayTarget
+internal sealed partial class ShareSheetTarget : TrayTarget
 {
     public override TargetGroup Group => TargetGroup.Send;
 
@@ -84,7 +84,7 @@ internal sealed class ShareSheetTarget : TrayTarget
 }
 
 /// <summary>One LocalSend tile; dropping opens the device picker (pick the device after the drop).</summary>
-internal sealed class LocalSendTarget(Action<DragPayload> openPicker) : TrayTarget
+internal sealed partial class LocalSendTarget(Action<DragPayload> openPicker) : TrayTarget
 {
     public override TargetGroup Group => TargetGroup.Send;
 

@@ -19,7 +19,7 @@ internal sealed record DragPayload(IReadOnlyList<string> Paths, DataPackageOpera
 internal sealed record DropPlan(bool Accepts, string Caption, bool ShowGlyph = false);
 
 /// <summary>One tile in the tray. Subclasses decide what a drop means.</summary>
-internal abstract class TrayTarget : INotifyPropertyChanged
+internal abstract partial class TrayTarget : INotifyPropertyChanged
 {
     private ImageSource? _icon;
     private string? _subtitle;
