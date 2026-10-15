@@ -17,12 +17,27 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <BuiltInComInteropSupport>true</BuiltInComInteropSupport>
+    <!-- English UI only for now: skip the 3 MB of satellite resource assemblies. -->
+    <SatelliteResourceLanguages>en</SatelliteResourceLanguages>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Microsoft.WindowsAppSDK" Version="2.2.0" />
     <PackageReference Include="Microsoft.Windows.SDK.BuildTools" Version="10.0.26100.6901" />
     <PackageReference Include="WinUIEx" Version="2.8.0" />
     <PackageReference Include="CommunityToolkit.WinUI.Controls.SettingsControls" Version="8.2.251219" />
+
+    <!--
+      Package diet. The Windows App SDK metapackage (pulled in directly and by the Community Toolkit) brings AI, ML,
+      Widgets and WebView2 runtimes that Spare Hand never uses: onnxruntime + DirectML alone were ~38 MB. A direct
+      reference with ExcludeAssets="all" keeps their files out of the build.
+    -->
+    <PackageReference Include="Microsoft.WindowsAppSDK.AI" Version="2.2.3" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.ML" Version="2.1.70" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.WindowsAppSDK.Widgets" Version="2.0.5" ExcludeAssets="all" />
+    <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.3719.77" ExcludeAssets="all" />
+    <!-- ExcludeAssets does not cascade: the ML package's own dependency carries the 40 MB of ONNX Runtime + DirectML. -->
+    <PackageReference Include="Microsoft.Windows.AI.MachineLearning" Version="2.1.70" ExcludeAssets="all" />
+    <PackageReference Include="System.Numerics.Tensors" Version="9.0.0" ExcludeAssets="all" />
   </ItemGroup>
   <ItemGroup>
     <!-- The app icon, also loaded at runtime for the notification area and windows. -->

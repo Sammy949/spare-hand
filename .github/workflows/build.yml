@@ -4,10 +4,16 @@ on:
   push:
     branches: [main]
   pull_request:
+  workflow_dispatch:
 
 jobs:
   build:
     runs-on: windows-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        # "trimmed" is under evaluation: it must pass a manual smoke test before releases use it.
+        variant: [standard, trimmed]
     steps:
       - uses: actions/checkout@v4
 
@@ -15,17 +21,25 @@ jobs:
         with:
           dotnet-version: 10.0.x
 
-      - name: Publish (Release, self-contained, x64)
-        run: dotnet publish src/SpareHand/SpareHand.csproj -c Release -r win-x64 --self-contained -p:Platform=x64 -o publish
+      - name: Publish (Release, self-contained, x64, ${{ matrix.variant }})
+        shell: pwsh
+        run: |
+          $extra = @()
+          if ('${{ matrix.variant }}' -eq 'trimmed') { $extra = @('-p:PublishTrimmed=true', '-p:TrimMode=partial') }
+          dotnet publish src/SpareHand/SpareHand.csproj -c Release -r win-x64 --self-contained -p:Platform=x64 @extra -o publish 2>&1 | Tee-Object build.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          "trim warnings: " + (Select-String -Path build.log -Pattern 'warning IL\d+' | Measure-Object).Count
 
-      - name: Smoke-check the output
+      - name: Size report
         shell: pwsh
         run: |
           if (-not (Test-Path publish/SpareHand.exe)) { throw "SpareHand.exe missing from publish output" }
-          "{0:N1} MB published" -f ((Get-ChildItem publish -Recurse | Measure-Object Length -Sum).Sum / 1MB)
+          $files = Get-ChildItem publish -Recurse -File
+          "{0:N1} MB in {1} files ({2})" -f (($files | Measure-Object Length -Sum).Sum / 1MB), $files.Count, '${{ matrix.variant }}'
+          $files | Sort-Object Length -Descending | Select-Object -First 15 | ForEach-Object { "{0,8:N1} MB  {1}" -f ($_.Length / 1MB), $_.Name }
 
       - uses: actions/upload-artifact@v4
         with:
-          name: SpareHand-win-x64-${{ github.sha }}
+          name: SpareHand-win-x64-${{ matrix.variant }}-${{ github.sha }}
           path: publish/
           retention-days: 14
