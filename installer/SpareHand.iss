@@ -52,7 +52,7 @@ Name: "{autoprograms}\Spare Hand"; Filename: "{app}\SpareHand.exe"
 
 [Registry]
 ; The same value the app's own "Start with Windows" setting reads and writes (SystemIntegration.cs).
-Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "SpareHand"; ValueData: """{app}\SpareHand.exe"""; Tasks: startup
+Root: HKCU; Subkey: "Software\Microsoft\Windows\CurrentVersion\Run"; ValueType: string; ValueName: "SpareHand"; ValueData: """{app}\SpareHand.exe"" --background"; Tasks: startup
 
 [Run]
 Filename: "{app}\SpareHand.exe"; Description: "Open Spare Hand"; Flags: nowait postinstall skipifsilent

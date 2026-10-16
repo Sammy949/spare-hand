@@ -32,7 +32,7 @@ Click anywhere outside, press Esc, or double-tap again to close it.
 
 ## Settings
 
-Right-click the hand in the notification area. You can change the trigger key (Alt, Ctrl or Shift), pick which Send tiles show up, add a normal shortcut for the library, keep Spare Hand quiet in fullscreen apps, games and any app you choose, and start it with Windows.
+Open Spare Hand from the Start menu, or right-click the hand in the notification area (a left click opens the Hold library). You can change the trigger key (Alt, Ctrl or Shift), pick which Send tiles show up, add a normal shortcut for the library, keep Spare Hand quiet in fullscreen apps, games and any app you choose, and start it with Windows.
 
 If you pick Ctrl and have PowerToys Find My Mouse on its default double-Ctrl, the settings page warns you, because both would fire.
 

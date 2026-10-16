@@ -31,7 +31,7 @@ internal sealed class Settings
     /// <summary>Optional extra shortcut for the library, e.g. "Win+Shift+H", for keys that clash with other tools.</summary>
     public string LibraryHotkey { get; set; } = string.Empty;
 
-    /// <summary>Notification-area icon. When hidden, launching Spare Hand again opens the library (docs/research.md: 6 asks).</summary>
+    /// <summary>Notification-area icon. When hidden, opening Spare Hand from the Start menu shows settings, where it can be turned back on (docs/research.md: 6 asks).</summary>
     public bool ShowNotifyIcon { get; set; } = true;
 
     /// <summary>Never trigger while a fullscreen app, game or presentation is in front (boring.notch #119; docs/research.md).</summary>

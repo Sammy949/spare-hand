@@ -33,9 +33,10 @@ public partial class App : Application
         _showSignal = new EventWaitHandle(false, EventResetMode.AutoReset, @"Local\SpareHand.Show");
         if (!first)
         {
-            // Launching again while running opens the library in the running instance (the way back in when the
-            // notification-area icon is hidden).
-            Log.Write("another instance is running; asking it to open the library");
+            // Opening Spare Hand again (Start menu, a shortcut) while it runs brings up its settings: that is what
+            // someone who clicks the app expects, and the way back in when the notification-area icon is hidden.
+            // The Hold library is the notification-area icon's job.
+            Log.Write("another instance is running; asking it to open settings");
             _showSignal.Set();
             Exit();
             return;
@@ -64,7 +65,7 @@ public partial class App : Application
         {
             while (_showSignal.WaitOne())
             {
-                ui.TryEnqueue(_tray.ToggleLibrary);
+                ui.TryEnqueue(OpenSettings);
             }
         })
         { IsBackground = true, Name = "SpareHand show signal" }.Start();
@@ -116,6 +117,14 @@ public partial class App : Application
             {
                 _guide?.ShowForTest(argv[guideStateArg + 1]);
             }
+        }
+
+        // Opened by hand (no arguments) once the guide has been seen: show settings, so clicking the app always
+        // shows something. Start with Windows passes --background and opens nothing.
+        SystemIntegration.UpgradeStartupEntry();
+        if (settings.GuideShown && argv.Length == 1)
+        {
+            OpenSettings();
         }
 
         if (argv.Contains("--settings"))

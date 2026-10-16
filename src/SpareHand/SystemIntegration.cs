@@ -9,6 +9,11 @@ internal static class SystemIntegration
     private const string RunKey = @"Software\Microsoft\Windows\CurrentVersion\Run";
     private const string RunValue = "SpareHand";
 
+    /// <summary>Passed at sign-in, so starting with Windows doesn't open the settings window.</summary>
+    public const string BackgroundArg = "--background";
+
+    private static string RunCommand => $"\"{Environment.ProcessPath}\" {BackgroundArg}";
+
     public static bool StartsWithWindows
     {
         get
@@ -22,7 +27,7 @@ internal static class SystemIntegration
             using var key = Registry.CurrentUser.CreateSubKey(RunKey);
             if (value)
             {
-                key.SetValue(RunValue, $"\"{Environment.ProcessPath}\"");
+                key.SetValue(RunValue, RunCommand);
             }
             else
             {
@@ -30,6 +35,28 @@ internal static class SystemIntegration
             }
 
             Log.Write($"start with Windows = {value}");
+        }
+    }
+
+    /// <summary>
+    /// Entries written before v0.1.2 start Spare Hand with no arguments, which now opens settings. Rewrite our own
+    /// entry with --background; leave anything that points at another copy alone.
+    /// </summary>
+    public static void UpgradeStartupEntry()
+    {
+        try
+        {
+            using var key = Registry.CurrentUser.OpenSubKey(RunKey, writable: true);
+            if (key?.GetValue(RunValue) is string value && !value.Contains(BackgroundArg, StringComparison.Ordinal) &&
+                value.Contains(Environment.ProcessPath!, StringComparison.OrdinalIgnoreCase))
+            {
+                key.SetValue(RunValue, RunCommand);
+                Log.Write("start with Windows entry upgraded to --background");
+            }
+        }
+        catch (Exception e)
+        {
+            Log.Write($"couldn't upgrade the startup entry: {e.Message}");
         }
     }
 
