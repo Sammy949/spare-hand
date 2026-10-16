@@ -51,6 +51,13 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
     private DragPayload? _payload;
     private Task<IReadOnlyList<string>> _openFolders = Task.FromResult<IReadOnlyList<string>>([]);
 
+    /// <summary>The tray is on screen. With <see cref="Dropped"/> and <see cref="LibraryOpened"/>, what the first-run guide watches.</summary>
+    internal event Action? Shown;
+
+    internal event Action<TrayTarget>? Dropped;
+
+    internal event Action? LibraryOpened;
+
     internal TrayWindow(Settings settings, HoldStore hold, LocalSendService localSend)
     {
         _settings = settings;
@@ -97,6 +104,7 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
             {
                 _libraryInstance = new HoldLibrary(_hold, _settings, _quickShareAvailable, paths =>
                     Picker.Open(new DragPayload(paths, DataPackageOperation.Copy), GetCursorPos(out var at) ? at : default));
+                _libraryInstance.Opened += () => LibraryOpened?.Invoke();
                 if (_themeOverride is { } theme)
                 {
                     _libraryInstance.ApplyTheme(theme);
@@ -208,6 +216,7 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
         Cloak(false);
         Pop();
         Log.Write($"tray shown {side} at {x},{y} {w}x{h} (send={SendRow.Children.Count} move={MoveRow.Children.Count})");
+        Shown?.Invoke();
         if (Environment.GetCommandLineArgs().Contains("--hot") && SendRow.Children.FirstOrDefault() is TrayTile hot)
         {
             hot.ShowHotForTest();
@@ -279,6 +288,7 @@ public sealed partial class TrayWindow : WindowEx, ITileHost
     {
         _dropped = true;
         Log.Write($"drop on {target.Title}: {payload.Paths.Count} item(s)");
+        Dropped?.Invoke(target);
 
         // Close first, then act: the drop must feel instant, and long work (LocalSend) continues in the background.
         _ui.TryEnqueue(async () =>

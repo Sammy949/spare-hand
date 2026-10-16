@@ -88,6 +88,8 @@ public sealed partial class HoldLibrary : WindowEx
     }
 
     /// <summary>Opens at the cursor; a second request while open closes it (a toggle, like Win+V).</summary>
+    internal event Action? Opened;
+
     internal void Toggle()
     {
         if (_open)
@@ -119,6 +121,7 @@ public sealed partial class HoldLibrary : WindowEx
         Filter.Focus(FocusState.Programmatic);
         GetWindowRect(_hwnd, out var r);
         Log.Write($"hold library open ({_store.Items.Count} item(s)) at {r.Left},{r.Top} {r.Right - r.Left}x{r.Bottom - r.Top}");
+        Opened?.Invoke();
     }
 
     private void Close(string reason)

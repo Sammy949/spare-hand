@@ -75,6 +75,15 @@ internal sealed class HoldStore
 
     public int Clear() => Remove(_items.Select(i => i.Path).ToList());
 
+    /// <summary>Removes without an undo entry: for the guide's practice file, which is deleted from disk too.</summary>
+    public void Forget(string path)
+    {
+        if (_items.RemoveAll(i => string.Equals(i.Path, path, StringComparison.OrdinalIgnoreCase)) > 0)
+        {
+            Save();
+        }
+    }
+
     /// <summary>Puts the most recently removed batch back where it was.</summary>
     public int UndoRemove()
     {
