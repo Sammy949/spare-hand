@@ -4,7 +4,7 @@ using SpareHand.Shell;
 namespace SpareHand.Hold;
 
 /// <summary>
-/// Opt-in: new screenshots land in Hold, silently. Watches Windows' Screenshots folder (Win+PrtScn, Snipping Tool,
+/// On by default (a switch in settings and the guide): new screenshots land in Hold, silently. Watches Windows' Screenshots folder (Win+PrtScn, Snipping Tool,
 /// Win+Shift+S). Measured on a real PC: Win+PrtScn writes the whole file at once, Snipping Tool creates it empty and
 /// fills it ~90 ms later, so a file is held only once its writes have been quiet for a moment and it opens as a
 /// complete image. Only the watcher's own items roll off when the day ends; the files are never touched.
