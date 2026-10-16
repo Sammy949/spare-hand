@@ -30,6 +30,9 @@ Double-tap Alt with nothing held and the **Hold library** opens at your cursor: 
 
 Click anywhere outside, press Esc, or double-tap again to close it.
 
+
+**New screenshots can land in Hold on their own** (off until you turn it on, in the guide or in settings). Snipping Tool, Win+Shift+S and Win+PrtScn captures show up quietly, newest first. Only today's stay; older ones leave Hold at midnight, and the files themselves are never touched.
+
 ## Settings
 
 Open Spare Hand from the Start menu, or right-click the hand in the notification area (a left click opens the Hold library). You can change the trigger key (Alt, Ctrl or Shift), pick which Send tiles show up, add a normal shortcut for the library, keep Spare Hand quiet in fullscreen apps, games and any app you choose, and start it with Windows.

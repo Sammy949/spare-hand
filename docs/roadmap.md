@@ -14,6 +14,8 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
 - Idle memory 6–9 MB (Task Manager), PowerToys-style trimming
 - A per-user installer (SpareHand-Setup.exe, 24 MB, no admin), trimmed to 90 MB installed
 - A first-run guide that has you do the gesture for real, reopenable from the tray menu
+- Opt-in: new screenshots land in Hold quietly (Screenshots folder: Snipping Tool, Win+PrtScn); only today's stay
+- Opening Spare Hand from Start shows settings; the notification-area icon opens the library
 
 ## v1: before a first release
 
@@ -30,7 +32,7 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
 
 ## Next
 
-- Opt-in: new screenshots and downloads land in Hold automatically
+- Opt-in: new downloads (and Game Bar captures) land in Hold automatically
 - Space opens the item in PowerToys Peek
 - A browsable "Recently removed" list
 - Pinned items

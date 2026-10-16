@@ -133,11 +133,17 @@
 
                 <!--  Hold  -->
                 <TextBlock Style="{StaticResource BodyStrongTextBlockStyle}" Margin="0,24,0,8" Text="Hold" />
-                <tk:SettingsCard Description="Off by default: nothing leaves Hold on its own. Hold keeps links to your files and never copies, moves or expires them." Header="Remove items after dragging them out">
+                <tk:SettingsCard Description="Off by default. Hold keeps links to your files and never copies, moves or deletes them." Header="Remove items after dragging them out">
                     <tk:SettingsCard.HeaderIcon>
                         <FontIcon Glyph="&#xE74D;" />
                     </tk:SettingsCard.HeaderIcon>
                     <ToggleSwitch x:Name="RemoveAfterDragOut" Toggled="OnRemoveAfterDragOutToggled" />
+                </tk:SettingsCard>
+                <tk:SettingsCard x:Name="ScreenshotsCard" Description="Snipping Tool, Win+Shift+S and Win+PrtScn captures appear in Hold, quietly. Only today's stay; the files are never touched." Header="Hold new screenshots">
+                    <tk:SettingsCard.HeaderIcon>
+                        <FontIcon Glyph="&#xEB9F;" />
+                    </tk:SettingsCard.HeaderIcon>
+                    <ToggleSwitch x:Name="HoldNewScreenshots" Toggled="OnHoldNewScreenshotsToggled" />
                 </tk:SettingsCard>
 
                 <!--  Quiet  -->

@@ -4,13 +4,17 @@ namespace SpareHand.Hold;
 
 internal sealed record HoldItem(string Path, DateTimeOffset AddedAt)
 {
+    /// <summary>Who added it when it wasn't you: "screenshot" for the screenshot watcher; null for your own drops.</summary>
+    public string? Source { get; init; }
+
     [System.Text.Json.Serialization.JsonIgnore]
     public bool Exists => File.Exists(Path) || Directory.Exists(Path);
 }
 
 /// <summary>
 /// The Hold shelf's contents: references to files, never copies. Nothing is ever copied, moved, modified or
-/// expired. Research: Dropshelf turned held files into 0 KB files, NotchDrop deletes them after a day, NotchNook
+/// deleted, and nothing you put in Hold expires. The one exception is opt-in: references the screenshot watcher added
+/// leave Hold when their day ends (the files stay where they are). Research: Dropshelf turned held files into 0 KB files, NotchDrop deletes them after a day, NotchNook
 /// moves the original on drag-out (docs/research.md, docs/research.md). Removals are kept in batches so they can be undone.
 /// </summary>
 internal sealed class HoldStore
@@ -50,6 +54,50 @@ internal sealed class HoldStore
 
         Save();
         return added;
+    }
+
+    /// <summary>Adds paths on someone else's behalf (the screenshot watcher), tagged so they can roll off later.</summary>
+    public int AddFrom(IEnumerable<string> paths, string source)
+    {
+        var added = 0;
+        foreach (var path in paths.Select(Path.GetFullPath))
+        {
+            if (_items.Any(i => string.Equals(i.Path, path, StringComparison.OrdinalIgnoreCase)))
+            {
+                continue;
+            }
+
+            _items.Insert(0, new HoldItem(path, DateTimeOffset.Now) { Source = source });
+            added++;
+        }
+
+        if (added > 0)
+        {
+            Save();
+        }
+
+        return added;
+    }
+
+    /// <summary>Forgets one path, but only if <paramref name="source"/> added it (never an item you held yourself).</summary>
+    public void ForgetFrom(string path, string source)
+    {
+        if (_items.RemoveAll(i => i.Source == source && string.Equals(i.Path, path, StringComparison.OrdinalIgnoreCase)) > 0)
+        {
+            Save();
+        }
+    }
+
+    /// <summary>Forgets <paramref name="source"/>'s items added before <paramref name="day"/> (local time). No undo entry: the files are untouched.</summary>
+    public int ForgetOlderThan(string source, DateTime day)
+    {
+        var removed = _items.RemoveAll(i => i.Source == source && i.AddedAt.LocalDateTime.Date < day.Date);
+        if (removed > 0)
+        {
+            Save();
+        }
+
+        return removed;
     }
 
     /// <summary>Removes the given paths as one undoable batch.</summary>

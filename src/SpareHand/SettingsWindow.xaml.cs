@@ -64,6 +64,7 @@ public sealed partial class SettingsWindow : WindowEx
         ShowQuickShare.IsOn = _settings.ShowQuickShare;
         ShowLocalSend.IsOn = _settings.ShowLocalSend;
         RemoveAfterDragOut.IsOn = _settings.RemoveAfterDragOut;
+        HoldNewScreenshots.IsOn = _settings.HoldNewScreenshots;
         PauseInFullscreen.IsOn = _settings.PauseInFullscreen;
         StartWithWindows.IsOn = SystemIntegration.StartsWithWindows;
         ShowNotifyIcon.IsOn = _settings.ShowNotifyIcon;
@@ -175,6 +176,17 @@ public sealed partial class SettingsWindow : WindowEx
         }
 
         _settings.RemoveAfterDragOut = RemoveAfterDragOut.IsOn;
+        Save();
+    }
+
+    private void OnHoldNewScreenshotsToggled(object sender, RoutedEventArgs e)
+    {
+        if (_loading)
+        {
+            return;
+        }
+
+        _settings.HoldNewScreenshots = HoldNewScreenshots.IsOn;
         Save();
     }
 

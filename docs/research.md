@@ -90,3 +90,24 @@ PowerToys' structure and design language so it could move upstream later.
   scan of the local /24, because some phones don't answer multicast.
 - **Windows Share sheet** via `IDataTransferManagerInterop::ShowShareUIForWindow`. The sheet attaches to its owner
   window and shows nothing if that window is hidden, so it gets its own small activated host window.
+
+## Screenshots into Hold
+
+**Where they go:** Windows' *Screenshots* known folder (`FOLDERID_Screenshots`, normally `Pictures\Screenshots`; under
+OneDrive when it backs up Pictures). Win+PrtScn saves there, and so does Snipping Tool (Win+Shift+S, and the PrtScn
+key by default on Windows 11), whose auto-save is on by default. On the test PC, 381 of 427 screenshots were Snipping
+Tool's and 45 were Win+PrtScn's. Game Bar captures go to `Videos\Captures`, screen recordings to `Videos\Screen Recordings`.
+
+**How the files are written** (measured with a file-system watcher while the shortcuts were pressed):
+
+| Capture | Appears after | Write pattern |
+|---|---|---|
+| Win+PrtScn | 0.7 s | Complete at creation, a few change events within 80 ms |
+| Snipping Tool | 0.23 s after the snip | Created empty (0 bytes), filled ~90 ms later |
+| Game Bar | 2.6 s | Created empty and locked, a transient 4.5 MB size, then 292 KB; named after the active window |
+
+So a new file is held only after its writes have been quiet for 0.5 s and it opens unlocked as a real PNG, JPEG, GIF
+or BMP. **Mac apps:** Dropover watches the screenshot folder and opens a shelf per screenshot (it can't see
+clipboard-only captures); Yoink has no built-in option, and its users rely on Hazel or Automator folder rules.
+Sources: [Dropover: Screenshot Shelves](https://dropoverapp.com/kb/screenshots),
+[Eleven Forum: Snipping Tool auto-save](https://elevenforum.com/t/enable-or-disable-snipping-tool-auto-save-screenshots-in-windows-11.9418/).

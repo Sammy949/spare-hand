@@ -165,11 +165,22 @@
                             <Run x:Name="SettingsLine" Text="Right-click the hand in the notification area. Alt can become Ctrl or Shift there." />
                         </TextBlock>
                     </Grid>
-                    <ToggleSwitch
-                        x:Name="StartWithWindows"
-                        Margin="34,2,0,0"
-                        Header="Start Spare Hand when I sign in"
-                        Toggled="OnStartWithWindowsToggled" />
+                    <!--  Two opt-ins side by side, so the step stays inside the fixed-height surface.  -->
+                    <Grid Margin="34,2,0,0" ColumnSpacing="24">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+                        <ToggleSwitch
+                            x:Name="StartWithWindows"
+                            Header="Start when I sign in"
+                            Toggled="OnStartWithWindowsToggled" />
+                        <ToggleSwitch
+                            x:Name="HoldNewScreenshots"
+                            Grid.Column="1"
+                            Header="Hold new screenshots"
+                            Toggled="OnHoldNewScreenshotsToggled" />
+                    </Grid>
                 </StackPanel>
 
                 <!--  Live status for steps 1 and 2: the key to press, and what Spare Hand is waiting for.  -->

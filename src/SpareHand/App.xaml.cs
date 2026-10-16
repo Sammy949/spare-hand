@@ -18,6 +18,7 @@ public partial class App : Application
     private TrayWindow? _tray;
     private HoldStore? _hold;
     private Guide.GuideWindow? _guide;
+    private ScreenshotWatcher? _screenshots; // kept: it owns the folder watcher and its timers
     private ElementTheme? _themeOverride;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _selfTestTimer;
 
@@ -59,6 +60,7 @@ public partial class App : Application
         _tray = new TrayWindow(settings, hold, localSend);
         _tray.Prepare(watcher);
         watcher.Start();
+        _screenshots = new ScreenshotWatcher(hold, settings, _tray.DispatcherQueue);
 
         var ui = _tray.DispatcherQueue;
         new Thread(() =>

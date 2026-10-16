@@ -67,7 +67,7 @@ public sealed partial class GuideWindow : WindowEx
 
         KeycapText.Text = _key;
         var others = string.Join(" or ", Enum.GetNames<TriggerKey>().Where(k => k != _key));
-        SettingsLine.Text = $"Right-click the hand in the notification area. {_key} can become {others} there.";
+        SettingsLine.Text = $"Open Spare Hand from Start, or right-click its icon. {_key} can become {others} there.";
         EnsurePracticeFile();
         _ = LoadPracticeIconAsync();
 
@@ -166,6 +166,7 @@ public sealed partial class GuideWindow : WindowEx
         {
             _loading = true;
             StartWithWindows.IsOn = SystemIntegration.StartsWithWindows;
+            HoldNewScreenshots.IsOn = _settings.HoldNewScreenshots;
             _loading = false;
         }
 
@@ -274,6 +275,15 @@ public sealed partial class GuideWindow : WindowEx
     }
 
     private void OnSkipGuide(object sender, RoutedEventArgs e) => Close();
+
+    private void OnHoldNewScreenshotsToggled(object sender, RoutedEventArgs e)
+    {
+        if (!_loading)
+        {
+            _settings.HoldNewScreenshots = HoldNewScreenshots.IsOn;
+            _settings.Save();
+        }
+    }
 
     private void OnStartWithWindowsToggled(object sender, RoutedEventArgs e)
     {

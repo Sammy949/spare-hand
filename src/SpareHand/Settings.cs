@@ -22,6 +22,9 @@ internal sealed class Settings
 
     public bool ShowLocalSend { get; set; } = true;
 
+    /// <summary>Opt-in: new screenshots land in Hold silently, and only today's stay (the files are never touched).</summary>
+    public bool HoldNewScreenshots { get; set; }
+
     /// <summary>The first-run guide has been shown (finished, skipped or closed). It can be reopened from the tray menu.</summary>
     public bool GuideShown { get; set; }
 
