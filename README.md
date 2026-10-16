@@ -31,7 +31,7 @@ Double-tap Alt with nothing held and the **Hold library** opens at your cursor: 
 Click anywhere outside, press Esc, or double-tap again to close it.
 
 
-**New screenshots can land in Hold on their own** (off until you turn it on, in the guide or in settings). Snipping Tool, Win+Shift+S and Win+PrtScn captures show up quietly, newest first. Only today's stay; older ones leave Hold at midnight, and the files themselves are never touched.
+**New screenshots can land in Hold on their own** (on by default; switch it off in the guide or in settings). Snipping Tool, Win+Shift+S and Win+PrtScn captures show up quietly, newest first. Only today's stay; older ones leave Hold at midnight, and the files themselves are never touched.
 
 ## Settings
 

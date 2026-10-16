@@ -165,7 +165,7 @@
                             <Run x:Name="SettingsLine" Text="Right-click the hand in the notification area. Alt can become Ctrl or Shift there." />
                         </TextBlock>
                     </Grid>
-                    <!--  Two opt-ins side by side, so the step stays inside the fixed-height surface.  -->
+                    <!--  Two switches side by side, so the step stays inside the fixed-height surface.  -->
                     <Grid Margin="34,2,0,0" ColumnSpacing="24">
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />

@@ -13,7 +13,7 @@ internal sealed record HoldItem(string Path, DateTimeOffset AddedAt)
 
 /// <summary>
 /// The Hold shelf's contents: references to files, never copies. Nothing is ever copied, moved, modified or
-/// deleted, and nothing you put in Hold expires. The one exception is opt-in: references the screenshot watcher added
+/// deleted, and nothing you put in Hold expires. The one exception: references the screenshot watcher added
 /// leave Hold when their day ends (the files stay where they are). Research: Dropshelf turned held files into 0 KB files, NotchDrop deletes them after a day, NotchNook
 /// moves the original on drag-out (docs/research.md, docs/research.md). Removals are kept in batches so they can be undone.
 /// </summary>
