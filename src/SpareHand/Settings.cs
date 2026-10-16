@@ -22,6 +22,9 @@ internal sealed class Settings
 
     public bool ShowLocalSend { get; set; } = true;
 
+    /// <summary>The first-run guide has been shown (finished, skipped or closed). It can be reopened from the tray menu.</summary>
+    public bool GuideShown { get; set; }
+
     /// <summary>Double-tapping the trigger without a drag opens the Hold library.</summary>
     public bool LibraryOnDoubleTap { get; set; } = true;
 

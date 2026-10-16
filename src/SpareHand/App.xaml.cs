@@ -16,6 +16,9 @@ public partial class App : Application
     private DragWatcher? _watcher;
 
     private TrayWindow? _tray;
+    private HoldStore? _hold;
+    private Guide.GuideWindow? _guide;
+    private ElementTheme? _themeOverride;
     private Microsoft.UI.Dispatching.DispatcherQueueTimer? _selfTestTimer;
 
     public App()
@@ -42,7 +45,7 @@ public partial class App : Application
         Log.Write($"=== Spare Hand start ({string.Join(' ', argv.Skip(1))}) ===");
 
         var settings = _settings = Settings.Load();
-        var hold = new HoldStore();
+        var hold = _hold = new HoldStore();
         var localSend = new LocalSendService(LocalSendIdentity.LoadOrCreate());
         if (settings.ShowLocalSend)
         {
@@ -73,7 +76,8 @@ public partial class App : Application
         var themeArg = Array.IndexOf(argv, "--theme");
         if (themeArg >= 0 && themeArg + 1 < argv.Length)
         {
-            _tray.ApplyTheme(argv[themeArg + 1] == "light" ? ElementTheme.Light : ElementTheme.Dark);
+            _themeOverride = argv[themeArg + 1] == "light" ? ElementTheme.Light : ElementTheme.Dark;
+            _tray.ApplyTheme(_themeOverride.Value);
         }
 
         // Self-tests for the post-drop surfaces (no drag needed): --share-test <file>, --picker-test <file>,
@@ -100,6 +104,18 @@ public partial class App : Application
             _selfTestTimer.IsRepeating = false;
             _selfTestTimer.Tick += (_, _) => _tray.OpenPickerForTest(argv[pickerArg + 1]);
             _selfTestTimer.Start();
+        }
+
+        // First run (or --guide): the guide opens once the tray is ready, so the practice drag can summon it.
+        // --guide-state <stage> jumps to a stage for screenshots.
+        var guideStateArg = Array.IndexOf(argv, "--guide-state");
+        if ((!settings.GuideShown && !argv.Any(a => a.StartsWith("--", StringComparison.Ordinal))) || argv.Contains("--guide") || guideStateArg >= 0)
+        {
+            OpenGuide();
+            if (guideStateArg >= 0 && guideStateArg + 1 < argv.Length)
+            {
+                _guide?.ShowForTest(argv[guideStateArg + 1]);
+            }
         }
 
         if (argv.Contains("--settings"))
@@ -176,6 +192,7 @@ public partial class App : Application
             _notifyIcon = new Shell.NotifyIcon(() => _watcher!.Paused);
             _notifyIcon.LibraryRequested += () => ui.TryEnqueue(_tray.ToggleLibrary);
             _notifyIcon.SettingsRequested += () => ui.TryEnqueue(OpenSettings);
+            _notifyIcon.GuideRequested += () => ui.TryEnqueue(OpenGuide);
             _notifyIcon.PauseToggled += () => ui.TryEnqueue(() => SetPaused(!_watcher!.Paused));
             _notifyIcon.QuitRequested += () => ui.TryEnqueue(Quit);
             _notifyIcon.Start();
@@ -208,6 +225,27 @@ public partial class App : Application
         }
 
         _settingsWindow.Bring();
+    }
+
+    private void OpenGuide()
+    {
+        if (_guide is null)
+        {
+            _guide = new Guide.GuideWindow(_settings!, _hold!, _watcher!, _tray!);
+            if (_themeOverride is { } theme)
+            {
+                _guide.ApplyTheme(theme);
+            }
+
+            MemoryTrim.Opened();
+            _guide.Closed += (_, _) =>
+            {
+                _guide = null;
+                MemoryTrim.Closed("guide closed");
+            };
+        }
+
+        _guide.Bring();
     }
 
     private void Quit()

@@ -17,7 +17,8 @@ internal sealed class DragWatcher
     // Fields so the GC never collects delegates Windows is calling.
     private HookProc? _mouseProc, _keyProc;
 
-    private bool _buttonDown, _dragCandidate, _dragConfirmed;
+    // Written by the hook thread, and by the UI thread in NoteOwnDrag.
+    private volatile bool _buttonDown, _dragCandidate, _dragConfirmed;
     private POINT _downAt;
     private long _keyDownAt = -1, _lastTapAt = -1;
     private bool _keyIsDown, _otherKeyDuringTrigger;
@@ -102,6 +103,21 @@ internal sealed class DragWatcher
                 UnregisterHotKey(0, HotkeyId);
                 RegisterLibraryHotkey(HotkeyId);
             }
+        }
+    }
+
+    /// <summary>
+    /// A drag that starts in one of Spare Hand's own windows (the guide's practice file). WinUI drags don't create
+    /// the shell's SysDragImage window, so the hook can't confirm them by itself.
+    /// </summary>
+    public void NoteOwnDrag()
+    {
+        if (_buttonDown && !_dragConfirmed)
+        {
+            _dragCandidate = true;
+            _dragConfirmed = true;
+            Log.Write("drag started in Spare Hand's own window");
+            DragStarted?.Invoke(0);
         }
     }
 

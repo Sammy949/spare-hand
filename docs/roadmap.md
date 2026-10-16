@@ -12,6 +12,8 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
   clear with undo, click outside to close
 - Notification-area icon, settings page, start with Windows, quiet in fullscreen apps and excluded apps
 - Idle memory 6–9 MB (Task Manager), PowerToys-style trimming
+- A per-user installer (SpareHand-Setup.exe, 24 MB, no admin), trimmed to 90 MB installed
+- A first-run guide that has you do the gesture for real, reopenable from the tray menu
 
 ## v1: before a first release
 
@@ -23,8 +25,7 @@ The job: **a spare hand for moving and sharing files on Windows.** Everything he
 - Multi-monitor, mixed-scaling and elevated-window pass
 - Reliability pass: survive reboot and sleep, 100-item stress test, multi-file drag-out lands as separate files
 - The "lands in Hold" moment (no wobble)
-- One-time first-run tip, never repeated
-- Installer, signing, smaller release package (it's 217 MB unpacked: self-contained .NET + Windows App SDK)
+- Code signing, so SmartScreen stops warning
 - Optional monochrome notification-area icon (like PowerToys' "theme adaptive" setting)
 
 ## Next

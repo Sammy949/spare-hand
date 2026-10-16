@@ -13,7 +13,7 @@ internal sealed class NotifyIcon
     private const uint WM_SETTINGCHANGE = 0x001A, WM_DPICHANGED = 0x02E0, WM_CLOSE = 0x0010, WM_DESTROY = 0x0002;
     private const uint NIM_ADD = 0, NIM_MODIFY = 1, NIM_DELETE = 2, NIM_SETVERSION = 4;
     private const uint NIF_MESSAGE = 0x1, NIF_ICON = 0x2, NIF_TIP = 0x4, NIF_SHOWTIP = 0x80;
-    private const int CmdLibrary = 1, CmdSettings = 2, CmdPause = 3, CmdQuit = 4;
+    private const int CmdLibrary = 1, CmdSettings = 2, CmdPause = 3, CmdQuit = 4, CmdGuide = 5;
 
     // One window class for the process, so one static WndProc that is never collected. The first version kept the
     // delegate per instance: after the icon was turned off and on, the second instance reused the class registered
@@ -35,6 +35,8 @@ internal sealed class NotifyIcon
     public event Action? LibraryRequested;
 
     public event Action? SettingsRequested;
+
+    public event Action? GuideRequested;
 
     public event Action? PauseToggled;
 
@@ -203,6 +205,7 @@ internal sealed class NotifyIcon
         var menu = CreatePopupMenu();
         AppendMenu(menu, 0, CmdLibrary, "Open Hold library");
         AppendMenu(menu, 0, CmdSettings, "Settings");
+        AppendMenu(menu, 0, CmdGuide, "Show the guide");
         AppendMenu(menu, 0x800 /* MF_SEPARATOR */, 0, null);
         AppendMenu(menu, _isPaused() ? 0x8u /* MF_CHECKED */ : 0, CmdPause, "Pause");
         AppendMenu(menu, 0x800, 0, null);
@@ -218,6 +221,7 @@ internal sealed class NotifyIcon
         {
             case CmdLibrary: LibraryRequested?.Invoke(); break;
             case CmdSettings: SettingsRequested?.Invoke(); break;
+            case CmdGuide: GuideRequested?.Invoke(); break;
             case CmdPause: PauseToggled?.Invoke(); break;
             case CmdQuit: QuitRequested?.Invoke(); break;
         }

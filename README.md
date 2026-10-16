@@ -40,6 +40,8 @@ If you pick Ctrl and have PowerToys Find My Mouse on its default double-Ctrl, th
 
 **[Download SpareHand-Setup.exe](https://github.com/Sammy949/spare-hand/releases/latest/download/SpareHand-Setup.exe)** (about 24 MB) and run it. It installs just for you, so no admin prompt, and you can have it start when you sign in.
 
+The first time it opens, a short guide has you hold a practice file and get it back, so you learn the double-tap by doing it.
+
 Windows will probably say **"Windows protected your PC"** first. That's SmartScreen being cautious about a new app that isn't code-signed yet (signing costs money I haven't spent yet). Click **More info**, then **Run anyway**. If you'd rather not trust an installer from a stranger, the whole thing builds from this repo in a minute, see below.
 
 To remove it: Settings → Apps → Spare Hand → Uninstall. It asks whether to keep your settings and Hold list.
